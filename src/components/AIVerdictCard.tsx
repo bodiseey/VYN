@@ -9,6 +9,7 @@ import { AIVerdict, VehicleContext } from '@/lib/gemini';
 
 interface AIVerdictCardProps {
     context: VehicleContext;
+    onVerdictReady?: (verdict: AIVerdict) => void;
 }
 
 const ratingConfig = {
@@ -44,7 +45,7 @@ const ratingConfig = {
     },
 };
 
-export default function AIVerdictCard({ context }: AIVerdictCardProps) {
+export default function AIVerdictCard({ context, onVerdictReady }: AIVerdictCardProps) {
     const [verdict, setVerdict] = useState<AIVerdict | null>(null);
     const [loading, setLoading] = useState(true);
     const [expanded, setExpanded] = useState(false);
@@ -62,6 +63,7 @@ export default function AIVerdictCard({ context }: AIVerdictCardProps) {
                 const data = await res.json();
                 if (data.success) {
                     setVerdict(data.verdict);
+                    onVerdictReady?.(data.verdict);
                 } else {
                     setError(true);
                 }

@@ -37,9 +37,10 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { getBrandLogo } from '@/lib/brand-utils';
 
 import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 import AIVerdictCard from '@/components/AIVerdictCard';
 import AIChatBubble from '@/components/AIChatBubble';
-import { VehicleContext } from '@/lib/gemini';
+import { VehicleContext, AIVerdict } from '@/lib/gemini';
 
 export default function ReportPage() {
     const t = useTranslations('Report');
@@ -47,9 +48,12 @@ export default function ReportPage() {
     const router = useRouter();
     const id = params.id as string;
     const [isMounted, setIsMounted] = useState(false);
+    const locale = useLocale();
     const [loading, setLoading] = useState(true);
     const [extending, setExtending] = useState(false);
+    const [downloading, setDownloading] = useState(false);
     const [report, setReport] = useState<UnifiedReport | null>(null);
+    const [verdict, setVerdict] = useState<AIVerdict | null>(null);
 
     useEffect(() => {
         setIsMounted(true);
@@ -80,6 +84,19 @@ export default function ReportPage() {
             console.error('Extension failed', error);
         } finally {
             setExtending(false);
+        }
+    };
+
+    const handleDownload = async () => {
+        if (!report) return;
+        setDownloading(true);
+        try {
+            const { generatePDFReport } = await import('@/lib/pdf-generator');
+            await generatePDFReport({ report, verdict, locale });
+        } catch (e) {
+            console.error('PDF generation failed', e);
+        } finally {
+            setDownloading(false);
         }
     };
 
@@ -240,16 +257,13 @@ export default function ReportPage() {
 
                     {/* AI Verdict Card */}
                     <div className="lg:col-span-3">
-                        <AIVerdictCard context={aiContext} />
+                        <AIVerdictCard context={aiContext} onVerdictReady={setVerdict} />
                     </div>
                 </div>
 
-                {/* Dashboard Tabs */}
-                <Tabs defaultValue={has999 ? "market" : "history"} className="space-y-6">
+                {/* Dashboard Tabs — Market moved to last */}
+                <Tabs defaultValue="national" className="space-y-6">
                     <TabsList className="bg-white/50 backdrop-blur-md border border-slate-200 p-1.5 rounded-[1.5rem] h-14 md:h-16 shadow-sm flex w-full overflow-x-auto gap-1">
-                        <TabsTrigger value="market" className="flex-1 rounded-xl data-[state=active]:bg-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-orange-600/20 font-black px-3 md:px-8 h-full flex gap-1 md:gap-3 transition-all text-xs md:text-sm whitespace-nowrap">
-                            <Tag className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" /> {t('marketTab')}
-                        </TabsTrigger>
                         <TabsTrigger value="national" className="flex-1 rounded-xl data-[state=active]:bg-emerald-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-emerald-600/20 font-black px-3 md:px-8 h-full transition-all text-xs md:text-sm whitespace-nowrap">
                             {t('nationalTab')}
                         </TabsTrigger>
@@ -259,6 +273,11 @@ export default function ReportPage() {
                         <TabsTrigger value="specs" className="flex-1 rounded-xl data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-slate-900/20 font-black px-3 md:px-8 h-full transition-all text-xs md:text-sm whitespace-nowrap">
                             {t('specsTab')}
                         </TabsTrigger>
+                        {has999 && (
+                            <TabsTrigger value="market" className="flex-1 rounded-xl data-[state=active]:bg-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-orange-600/20 font-black px-3 md:px-8 h-full flex gap-1 md:gap-3 transition-all text-xs md:text-sm whitespace-nowrap">
+                                <Tag className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" /> {t('marketTab')}
+                            </TabsTrigger>
+                        )}
                     </TabsList>
 
                     {/* Market Tab */}
@@ -546,8 +565,16 @@ export default function ReportPage() {
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <Button className="bg-white hover:bg-slate-100 text-slate-950 font-black rounded-xl md:rounded-2xl px-6 md:px-12 h-11 md:h-14 shadow-lg transition-all active:scale-95 text-sm md:text-lg">
-                            {t('download')}
+                        <Button
+                            onClick={handleDownload}
+                            disabled={downloading}
+                            className="bg-white hover:bg-slate-100 text-slate-950 font-black rounded-xl md:rounded-2xl px-6 md:px-12 h-11 md:h-14 shadow-lg transition-all active:scale-95 text-sm md:text-lg flex items-center gap-2"
+                        >
+                            {downloading ? (
+                                <><Loader2 className="w-4 h-4 animate-spin" /> PDF...</>
+                            ) : (
+                                <><Download className="w-4 h-4" /> {t('download')}</>
+                            )}
                         </Button>
                     </div>
                 </div>
