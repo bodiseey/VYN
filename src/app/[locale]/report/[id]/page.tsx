@@ -37,6 +37,9 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { getBrandLogo } from '@/lib/brand-utils';
 
 import { useTranslations } from 'next-intl';
+import AIVerdictCard from '@/components/AIVerdictCard';
+import AIChatBubble from '@/components/AIChatBubble';
+import { VehicleContext } from '@/lib/gemini';
 
 export default function ReportPage() {
     const t = useTranslations('Report');
@@ -113,6 +116,24 @@ export default function ReportPage() {
 
     const has999 = report.marketData.listings && report.marketData.listings.length > 0;
     const isExtended = !!report.allSpecs;
+
+    // Build AI context from report data
+    const aiContext: VehicleContext = {
+        vin: report.vin,
+        make: report.make,
+        model: report.model,
+        year: report.year,
+        specs: report.specs,
+        mileage: report.nationalData?.inspections?.[0]?.Mileage,
+        inspectionResult: report.nationalData?.inspections?.[0]?.Result,
+        inspectionDate: report.nationalData?.inspections?.[0]?.Date,
+        borderCrossings: report.nationalData?.borderCrossings?.length ?? 0,
+        marketListings: report.marketData.listings.length,
+        averagePrice: report.marketData.averagePrice,
+        nationalStatus: report.nationalData?.vehicle?.Status,
+        lastOperation: report.nationalData?.vehicle?.LastOperation,
+        color: report.nationalData?.vehicle?.Color,
+    };
 
     return (
         <div className="min-h-screen bg-slate-50 pb-24 font-sans">
@@ -203,7 +224,7 @@ export default function ReportPage() {
                         </CardContent>
                     </Card>
 
-                    <Card className="border-none shadow-xl rounded-[2.5rem] bg-white p-10 flex flex-col items-center justify-center space-y-6 relative overflow-hidden ring-1 ring-slate-100">
+                    <Card className="border-none shadow-xl rounded-[2rem] md:rounded-[2.5rem] bg-white p-10 flex flex-col items-center justify-center space-y-6 relative overflow-hidden ring-1 ring-slate-100">
                         <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
                         <h3 className="text-sm font-black uppercase tracking-[0.3em] text-slate-400">{t('securityScore')}</h3>
                         <div className="relative">
@@ -216,6 +237,11 @@ export default function ReportPage() {
                         </div>
                         <p className="text-center text-xs font-bold text-slate-400 leading-relaxed px-4">{t('scoreCalc')}</p>
                     </Card>
+
+                    {/* AI Verdict Card */}
+                    <div className="lg:col-span-3">
+                        <AIVerdictCard context={aiContext} />
+                    </div>
                 </div>
 
                 {/* Dashboard Tabs */}
@@ -526,6 +552,9 @@ export default function ReportPage() {
                     </div>
                 </div>
             </div>
+
+            {/* AI Chat Bubble */}
+            <AIChatBubble context={aiContext} />
         </div>
     );
 }
