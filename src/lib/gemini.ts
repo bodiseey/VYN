@@ -28,15 +28,19 @@ export interface VehicleContext {
     model: string;
     year: string;
     specs: Record<string, string>;
+    allSpecs?: Record<string, string>; // Full NHTSA extended specs (EXTRAS_PLUS)
     mileage?: number;
     inspectionResult?: string;
     inspectionDate?: string;
+    allInspections?: Array<{ Date: string; Result: string; Mileage: number; Station?: string }>;
     borderCrossings?: number;
+    allBorderCrossings?: Array<{ DateTime: string; Point: string; Direction: string }>;
     marketListings?: number;
     averagePrice?: number;
     nationalStatus?: string;
     lastOperation?: string;
     color?: string;
+    nationalVehicle?: Record<string, any>; // Full vehicle registry data
 }
 
 export interface AIVerdict {
@@ -57,30 +61,59 @@ function buildContextString(ctx: VehicleContext): string {
     const currentYear = new Date().getFullYear();
     const carAge = ctx.year ? currentYear - parseInt(ctx.year) : null;
 
+    // Use allSpecs if available (EXTRAS_PLUS), otherwise basic specs
+    const specsToUse = ctx.allSpecs && Object.keys(ctx.allSpecs).length > 0 ? ctx.allSpecs : ctx.specs;
+    const specsSection = Object.entries(specsToUse)
+        .filter(([, v]) => v && v !== 'N/A')
+        .map(([k, v]) => `- ${k}: ${v}`)
+        .join('\n');
+
+    const inspectionsSection = ctx.allInspections && ctx.allInspections.length > 0
+        ? ctx.allInspections.map(i =>
+            `  • ${i.Date}: ${i.Result} — ${i.Mileage?.toLocaleString()} km${i.Station ? ` (${i.Station})` : ''}`
+        ).join('\n')
+        : ctx.inspectionResult
+            ? `  • ${ctx.inspectionDate}: ${ctx.inspectionResult} — ${ctx.mileage?.toLocaleString()} km`
+            : '  No inspection data available';
+
+    const borderSection = ctx.allBorderCrossings && ctx.allBorderCrossings.length > 0
+        ? ctx.allBorderCrossings.map(b =>
+            `  • ${b.DateTime}: ${b.Point} (${b.Direction})`
+        ).join('\n')
+        : `  Total crossings: ${ctx.borderCrossings ?? 0}`;
+
+    const nationalSection = ctx.nationalVehicle
+        ? Object.entries(ctx.nationalVehicle)
+            .filter(([, v]) => v)
+            .map(([k, v]) => `- ${k}: ${v}`)
+            .join('\n')
+        : `- Status: ${ctx.nationalStatus || 'Not found in RM registry'}
+- Last Operation: ${ctx.lastOperation || 'N/A'}
+- Color: ${ctx.color || 'N/A'}`;
+
     return `
-=== VEHICLE DATA FOR ANALYSIS ===
+=== COMPLETE VEHICLE DATA FOR ANALYSIS ===
 VIN: ${ctx.vin}
 Make/Model/Year: ${ctx.year} ${ctx.make} ${ctx.model}
 Car Age: ${carAge ? `${carAge} years` : 'Unknown'}
+Data Completeness: ${ctx.allSpecs ? 'FULL (EXTRAS_PLUS extended scan)' : 'BASIC'}
 
-TECHNICAL SPECS:
-${Object.entries(ctx.specs).map(([k, v]) => `- ${k}: ${v}`).join('\n')}
+TECHNICAL SPECIFICATIONS (${Object.keys(specsToUse).length} data points):
+${specsSection}
 
-MOLDOVA REGISTRY DATA:
-- Registration Status: ${ctx.nationalStatus || 'Not found in RM registry'}
-- Last Official Operation: ${ctx.lastOperation || 'N/A'}
-- Color: ${ctx.color || 'N/A'}
+MOLDOVA NATIONAL REGISTRY:
+${nationalSection}
 
-TECHNICAL INSPECTION (ITP):
-- Last Inspection Result: ${ctx.inspectionResult || 'No inspection data'}
-- Last Inspection Date: ${ctx.inspectionDate || 'N/A'}
-- Recorded Mileage at Inspection: ${ctx.mileage ? `${ctx.mileage.toLocaleString()} km` : 'N/A'}
+TECHNICAL INSPECTIONS (ITP) — ALL RECORDS:
+${inspectionsSection}
 
-MARKET PRESENCE:
-- Active Ads on 999.md: ${ctx.marketListings ?? 0}
-- Average Market Price: ${ctx.averagePrice ? `€${ctx.averagePrice.toLocaleString()}` : 'N/A'}
-- Border Crossings Recorded: ${ctx.borderCrossings ?? 0}
-=================================
+BORDER CROSSINGS — ALL RECORDS:
+${borderSection}
+
+MARKET PRESENCE (999.md):
+- Active Listings Found: ${ctx.marketListings ?? 0}
+- Average Market Price: ${ctx.averagePrice ? `€${ctx.averagePrice.toLocaleString()}` : 'No market data'}
+==========================================
 `;
 }
 

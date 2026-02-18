@@ -134,23 +134,28 @@ export default function ReportPage() {
     const has999 = report.marketData.listings && report.marketData.listings.length > 0;
     const isExtended = !!report.allSpecs;
 
-    // Build AI context from report data
+    // Build AI context — 100% of available data
     const aiContext: VehicleContext = {
         vin: report.vin,
         make: report.make,
         model: report.model,
         year: report.year,
         specs: report.specs,
+        allSpecs: report.allSpecs, // Full NHTSA data if EXTRAS_PLUS unlocked
         mileage: report.nationalData?.inspections?.[0]?.Mileage,
         inspectionResult: report.nationalData?.inspections?.[0]?.Result,
         inspectionDate: report.nationalData?.inspections?.[0]?.Date,
+        allInspections: report.nationalData?.inspections || [],
         borderCrossings: report.nationalData?.borderCrossings?.length ?? 0,
+        allBorderCrossings: report.nationalData?.borderCrossings || [],
         marketListings: report.marketData.listings.length,
         averagePrice: report.marketData.averagePrice,
         nationalStatus: report.nationalData?.vehicle?.Status,
         lastOperation: report.nationalData?.vehicle?.LastOperation,
         color: report.nationalData?.vehicle?.Color,
+        nationalVehicle: report.nationalData?.vehicle || null,
     };
+
 
     return (
         <div className="min-h-screen bg-slate-50 pb-24 font-sans">
