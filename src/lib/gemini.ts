@@ -1,6 +1,6 @@
 /**
  * VYN.md — Gemini AI Brain
- * Senior Automotive Consultant powered by Google Gemini
+ * Senior Automotive Consultant powered by Google Gemini 2.0 Flash
  */
 
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
@@ -93,7 +93,7 @@ export async function generateAIVerdict(ctx: VehicleContext): Promise<AIVerdict>
     try {
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
-            model: 'gemini-1.5-flash',
+            model: 'gemini-2.0-flash',
             systemInstruction: SYSTEM_PROMPT,
             safetySettings: [
                 { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
@@ -124,11 +124,12 @@ Respond in Romanian language.`;
         const result = await model.generateContent(prompt);
         const text = result.response.text().trim();
 
-        // Extract JSON from response
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) throw new Error('No JSON in response');
+        // Extract JSON from response (handle markdown code blocks too)
+        const jsonMatch = text.match(/```json\s*([\s\S]*?)```/) || text.match(/\{[\s\S]*\}/);
+        const jsonStr = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : null;
+        if (!jsonStr) throw new Error('No JSON in response');
 
-        const parsed = JSON.parse(jsonMatch[0]);
+        const parsed = JSON.parse(jsonStr);
         return {
             rating: parsed.rating || 'yellow',
             title: parsed.title || 'Analiză incompletă',
@@ -159,7 +160,7 @@ export async function chatWithAI(
     try {
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
-            model: 'gemini-1.5-flash',
+            model: 'gemini-2.0-flash',
             systemInstruction: SYSTEM_PROMPT,
         });
 
