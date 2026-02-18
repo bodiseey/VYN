@@ -134,6 +134,21 @@ export default function ReportPage() {
     const has999 = report.marketData.listings && report.marketData.listings.length > 0;
     const isExtended = !!report.allSpecs;
 
+    // Calculate Security Score dynamically based on real data
+    const calcSecurityScore = (): number => {
+        let score = 40; // Base score for having VIN decoded
+        const specsCount = Object.values(report.specs).filter(v => v && v !== 'N/A').length;
+        score += Math.min(specsCount * 3, 20); // up to +20
+        if (report.allSpecs && Object.keys(report.allSpecs).length > 10) score += 10;
+        if (report.nationalData?.vehicle) score += 10;
+        const inspCount = report.nationalData?.inspections?.length ?? 0;
+        score += Math.min(inspCount * 5, 15); // up to +15
+        if ((report.nationalData?.borderCrossings?.length ?? 0) > 0) score += 5;
+        return Math.min(score, 99);
+    };
+    const securityScore = calcSecurityScore();
+    const securityColor = securityScore >= 80 ? 'emerald' : securityScore >= 60 ? 'amber' : 'red';
+
     // Build AI context — 100% of available data
     const aiContext: VehicleContext = {
         vin: report.vin,
@@ -141,7 +156,7 @@ export default function ReportPage() {
         model: report.model,
         year: report.year,
         specs: report.specs,
-        allSpecs: report.allSpecs, // Full NHTSA data if EXTRAS_PLUS unlocked
+        allSpecs: report.allSpecs,
         mileage: report.nationalData?.inspections?.[0]?.Mileage,
         inspectionResult: report.nationalData?.inspections?.[0]?.Result,
         inspectionDate: report.nationalData?.inspections?.[0]?.Date,
@@ -154,6 +169,7 @@ export default function ReportPage() {
         lastOperation: report.nationalData?.vehicle?.LastOperation,
         color: report.nationalData?.vehicle?.Color,
         nationalVehicle: report.nationalData?.vehicle || null,
+        securityScore,
     };
 
 
@@ -247,15 +263,15 @@ export default function ReportPage() {
                     </Card>
 
                     <Card className="border-none shadow-xl rounded-[2rem] md:rounded-[2.5rem] bg-white p-10 flex flex-col items-center justify-center space-y-6 relative overflow-hidden ring-1 ring-slate-100">
-                        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
+                        <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${securityColor === 'emerald' ? 'from-emerald-400 to-emerald-600' : securityColor === 'amber' ? 'from-amber-400 to-amber-600' : 'from-red-400 to-red-600'}`}></div>
                         <h3 className="text-sm font-black uppercase tracking-[0.3em] text-slate-400">{t('securityScore')}</h3>
                         <div className="relative">
-                            <div className="text-7xl font-black text-slate-900 tracking-tighter">{isExtended ? '98' : '95'}</div>
-                            <div className="absolute -top-1 -right-4 text-2xl font-black text-blue-600">%</div>
+                            <div className={`text-7xl font-black tracking-tighter ${securityColor === 'emerald' ? 'text-emerald-600' : securityColor === 'amber' ? 'text-amber-500' : 'text-red-500'}`}>{securityScore}</div>
+                            <div className={`absolute -top-1 -right-4 text-2xl font-black ${securityColor === 'emerald' ? 'text-emerald-600' : securityColor === 'amber' ? 'text-amber-500' : 'text-red-500'}`}>%</div>
                         </div>
-                        <div className="flex items-center gap-2 bg-emerald-50 px-4 py-1.5 rounded-full">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                            <span className="text-xs font-black text-emerald-700 tracking-widest uppercase">{t('verifiedData')}</span>
+                        <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full ${securityColor === 'emerald' ? 'bg-emerald-50' : securityColor === 'amber' ? 'bg-amber-50' : 'bg-red-50'}`}>
+                            <CheckCircle2 className={`w-4 h-4 ${securityColor === 'emerald' ? 'text-emerald-500' : securityColor === 'amber' ? 'text-amber-500' : 'text-red-500'}`} />
+                            <span className={`text-xs font-black tracking-widest uppercase ${securityColor === 'emerald' ? 'text-emerald-700' : securityColor === 'amber' ? 'text-amber-700' : 'text-red-700'}`}>{t('verifiedData')}</span>
                         </div>
                         <p className="text-center text-xs font-bold text-slate-400 leading-relaxed px-4">{t('scoreCalc')}</p>
                     </Card>

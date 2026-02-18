@@ -41,6 +41,7 @@ export interface VehicleContext {
     lastOperation?: string;
     color?: string;
     nationalVehicle?: Record<string, any>; // Full vehicle registry data
+    securityScore?: number; // Platform-calculated security score (0-99)
 }
 
 export interface AIVerdict {
@@ -113,6 +114,12 @@ ${borderSection}
 MARKET PRESENCE (999.md):
 - Active Listings Found: ${ctx.marketListings ?? 0}
 - Average Market Price: ${ctx.averagePrice ? `€${ctx.averagePrice.toLocaleString()}` : 'No market data'}
+
+PLATFORM SECURITY SCORE: ${ctx.securityScore ?? 'N/A'}% (calculated from data completeness)
+NOTE: Your verdict rating should be CONSISTENT with this score:
+- Score 80-99% → lean toward GREEN unless critical red flags exist
+- Score 60-79% → lean toward YELLOW (needs inspection)
+- Score 0-59%  → lean toward RED (high risk)
 ==========================================
 `;
 }
