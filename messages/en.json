@@ -187,5 +187,11 @@
     "Common": {
         "loading": "Loading...",
         "error": "An error occurred."
+    },
+    "PaymentCancel": {
+        "title": "Payment Cancelled",
+        "message": "The transaction was cancelled or failed. No amount was deducted from your account.",
+        "backHome": "BACK TO HOME",
+        "supportHint": "If you encountered technical issues, please contact us."
     }
 }

@@ -142,7 +142,7 @@ export default function VinScanner({ placeholder, cta, rehook }: VinScannerProps
                                     <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 pointer-events-none" />
                                     <Input
                                         placeholder={placeholder || t('placeholder')}
-                                        className="h-16 pl-14 pr-6 border-none bg-slate-50 rounded-2xl font-black tracking-widest text-slate-900 placeholder:text-slate-300 placeholder:font-bold focus:ring-0"
+                                        className="h-16 pl-14 pr-6 border-none bg-slate-50 rounded-2xl font-black tracking-widest text-base md:text-lg text-slate-900 placeholder:text-slate-300 placeholder:font-bold focus:ring-0"
                                         value={vin}
                                         onChange={(e) => setVin(e.target.value.toUpperCase())}
                                         maxLength={17}
@@ -168,13 +168,13 @@ export default function VinScanner({ placeholder, cta, rehook }: VinScannerProps
                             </motion.div>
                         )}
 
-                        <div className="flex flex-wrap items-center justify-center gap-6">
-                            <img src="/payment-logos/VISA-logo.png" className="h-4 w-auto grayscale hover:grayscale-0 transition-all duration-300 cursor-pointer" alt="Visa" />
-                            <img src="/payment-logos/Mastercard-logo.svg" className="h-6 w-auto grayscale hover:grayscale-0 transition-all duration-300 cursor-pointer" alt="Mastercard" />
-                            <img src="/payment-logos/Google_Pay_Logo.svg.png" className="h-5 w-auto grayscale hover:grayscale-0 transition-all duration-300 cursor-pointer" alt="Google Pay" />
-                            <img src="/payment-logos/Apple Pay.png" className="h-5 w-auto grayscale hover:grayscale-0 transition-all duration-300 cursor-pointer" alt="Apple Pay" />
-                            <img src="/payment-logos/logo-paynet.svg" className="h-5 w-auto grayscale hover:grayscale-0 transition-all duration-300 cursor-pointer" alt="Paynet" />
-                            <img src="/payment-logos/Mia Instant Payments.webp" className="h-6 w-auto grayscale hover:grayscale-0 transition-all duration-300 cursor-pointer" alt="MIA Instant" />
+                        <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
+                            <img src="/payment-logos/VISA-logo.png" className="h-3 md:h-4 w-auto grayscale hover:grayscale-0 transition-all duration-300 cursor-pointer" alt="Visa" />
+                            <img src="/payment-logos/Mastercard-logo.svg" className="h-5 md:h-6 w-auto grayscale hover:grayscale-0 transition-all duration-300 cursor-pointer" alt="Mastercard" />
+                            <img src="/payment-logos/Google_Pay_Logo.svg.png" className="h-4 md:h-5 w-auto grayscale hover:grayscale-0 transition-all duration-300 cursor-pointer" alt="Google Pay" />
+                            <img src="/payment-logos/Apple Pay.png" className="h-4 md:h-5 w-auto grayscale hover:grayscale-0 transition-all duration-300 cursor-pointer" alt="Apple Pay" />
+                            <img src="/payment-logos/logo-paynet.svg" className="h-4 md:h-5 w-auto grayscale hover:grayscale-0 transition-all duration-300 cursor-pointer" alt="Paynet" />
+                            <img src="/payment-logos/Mia Instant Payments.webp" className="h-5 md:h-6 w-auto grayscale hover:grayscale-0 transition-all duration-300 cursor-pointer" alt="MIA Instant" />
                         </div>
                     </motion.div>
                 ) : status === 'scanning' ? (
@@ -198,7 +198,7 @@ export default function VinScanner({ placeholder, cta, rehook }: VinScannerProps
                         key="found"
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="bg-white rounded-[2.5rem] p-10 shadow-3xl border border-slate-100 space-y-8 relative"
+                        className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 shadow-3xl border border-slate-100 space-y-6 md:space-y-8 relative"
                     >
                         <Button
                             variant="ghost"
@@ -215,10 +215,10 @@ export default function VinScanner({ placeholder, cta, rehook }: VinScannerProps
 
                         <div className="flex items-start justify-between gap-6">
                             <div className="space-y-4 flex-1">
-                                <h3 className="text-4xl font-black text-slate-900 tracking-tighter leading-none">
+                                <h3 className="text-2xl md:text-4xl font-black text-slate-900 tracking-tighter leading-none break-words">
                                     {vehicle?.ModelYear} {vehicle?.Make} {vehicle?.Model}
                                 </h3>
-                                <p className="font-mono text-slate-400 font-bold tracking-widest text-sm italic">{vin.toUpperCase()}</p>
+                                <p className="font-mono text-slate-400 font-bold tracking-widest text-xs md:text-sm italic">{vin.toUpperCase()}</p>
                             </div>
                             <div className="w-20 h-20 bg-white rounded-3xl border border-slate-100 shadow-xl flex items-center justify-center p-3 relative overflow-hidden group">
                                 <img

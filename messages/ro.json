@@ -187,5 +187,11 @@
     "Common": {
         "loading": "Se încarcă...",
         "error": "A apărut o eroare."
+    },
+    "PaymentCancel": {
+        "title": "Plată Anulată",
+        "message": "Tranzacția a fost anulată sau a eșuat. Nicio sumă nu a fost retrasă din contul tău.",
+        "backHome": "ÎNAPOI LA PRIMA PAGINĂ",
+        "supportHint": "Dacă ai întâmpinat probleme tehnice, te rugăm să ne contactezi."
     }
 }
