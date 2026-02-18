@@ -16,7 +16,13 @@ export async function POST(req: NextRequest) {
         const merchantCode = process.env.PAYNET_MERCHANT_CODE || '975860';
         const secretKey = process.env.PAYNET_MERCHANT_SEC_KEY || '5D270BA3-C74D-488C-951A-9D7416A1D11F';
 
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        // Smart URL detection:
+        // 1. NEXT_PUBLIC_APP_URL - manually set (highest priority)
+        // 2. VERCEL_URL - auto-injected by Vercel on every deployment
+        // 3. localhost fallback for local dev only
+        const vercelUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null;
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || vercelUrl || 'http://localhost:3000';
+
         const successUrl = `${baseUrl}/${locale}/payment/success?vin=${vin}&id=${externalId}`;
         const cancelUrl = `${baseUrl}/${locale}/payment/cancel`;
 

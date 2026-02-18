@@ -152,8 +152,8 @@ export default function ReportPage() {
             <div className="max-w-7xl mx-auto px-4 md:px-8 mt-8 space-y-8">
                 {/* Quick View */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <Card className="lg:col-span-2 border-none shadow-xl rounded-[2.5rem] bg-white overflow-hidden border border-slate-100 ring-1 ring-slate-100">
-                        <div className="h-56 bg-gradient-to-br from-slate-900 to-blue-900 p-12 relative overflow-hidden text-white">
+                    <Card className="lg:col-span-2 border-none shadow-xl rounded-[2rem] md:rounded-[2.5rem] bg-white overflow-hidden ring-1 ring-slate-100">
+                        <div className="min-h-[180px] md:h-56 bg-gradient-to-br from-slate-900 to-blue-900 p-6 md:p-12 relative overflow-hidden text-white">
                             {/* Background pattern */}
                             <div className="absolute inset-0 opacity-5 pointer-events-none select-none">
                                 <div className="flex flex-wrap gap-4 text-xs font-mono font-bold rotate-12">
@@ -162,24 +162,24 @@ export default function ReportPage() {
                             </div>
 
                             <div className="relative z-10 flex items-start justify-between gap-6">
-                                <div className="space-y-4">
+                                <div className="space-y-3 flex-1 min-w-0">
                                     <div className="flex flex-wrap gap-2">
                                         <Badge className="bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase px-3 py-1 backdrop-blur-md">{t('dbSyncOk')}</Badge>
                                         {has999 && <Badge className="bg-orange-500 border-none text-[10px] font-black uppercase text-white px-3 py-1 shadow-lg shadow-orange-500/20">{t('active999')}</Badge>}
                                         {isExtended && <Badge className="bg-yellow-400 text-slate-900 border-none text-[10px] font-black uppercase px-3 py-1 shadow-lg shadow-yellow-500/20">{t('extrasPlus')}</Badge>}
                                     </div>
                                     <div>
-                                        <h2 className="text-5xl font-black tracking-tighter leading-none mb-2">{report.year} {report.make} {report.model}</h2>
-                                        <p className="font-mono text-blue-200/60 font-medium tracking-[0.2em] text-sm flex items-center gap-2">
-                                            <ShieldCheck className="w-4 h-4" /> {report.vin}
+                                        <h2 className="text-2xl md:text-5xl font-black tracking-tighter leading-none mb-2 break-words">{report.year} {report.make} {report.model}</h2>
+                                        <p className="font-mono text-blue-200/60 font-medium tracking-[0.1em] md:tracking-[0.2em] text-xs md:text-sm flex items-center gap-2 truncate">
+                                            <ShieldCheck className="w-4 h-4 flex-shrink-0" /> {report.vin}
                                         </p>
                                     </div>
                                 </div>
 
-                                <div className="w-28 h-28 bg-white/10 backdrop-blur-xl rounded-[2.5rem] border border-white/10 flex items-center justify-center p-6 shadow-2xl relative group overflow-hidden flex-shrink-0">
+                                <div className="w-16 h-16 md:w-28 md:h-28 bg-white rounded-2xl md:rounded-[2.5rem] border border-white/20 flex items-center justify-center p-2 md:p-4 shadow-2xl relative group overflow-hidden flex-shrink-0">
                                     <img
                                         src={getBrandLogo(report.make)}
-                                        className="w-full h-full object-contain brightness-0 invert opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 z-10"
+                                        className="w-full h-full object-contain group-hover:scale-110 transition-all duration-500 z-10"
                                         alt={report.make}
                                         onError={(e) => {
                                             e.currentTarget.style.display = 'none';
@@ -187,17 +187,17 @@ export default function ReportPage() {
                                             if (next) next.classList.remove('opacity-0');
                                         }}
                                     />
-                                    <Car className="absolute inset-0 m-auto w-12 h-12 text-white/10 opacity-0 transition-opacity z-0" />
+                                    <Car className="absolute inset-0 m-auto w-8 h-8 md:w-12 md:h-12 text-slate-300 opacity-0 transition-opacity z-0" />
                                 </div>
                             </div>
                             <Car className="absolute bottom-[-30px] right-[-30px] w-72 h-72 text-white/5 -rotate-12 pointer-events-none" />
                         </div>
 
-                        <CardContent className="p-10 grid grid-cols-2 lg:grid-cols-4 gap-8">
+                        <CardContent className="p-5 md:p-10 grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
                             {Object.entries(report.specs).slice(0, 4).map(([key, value]) => (
                                 <div key={key} className="space-y-1 group">
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover:text-blue-500 transition-colors">{key}</p>
-                                    <p className="font-bold text-slate-900 text-lg tracking-tight">{value || '---'}</p>
+                                    <p className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover:text-blue-500 transition-colors">{key}</p>
+                                    <p className="font-bold text-slate-900 text-base md:text-lg tracking-tight truncate">{value || '---'}</p>
                                 </div>
                             ))}
                         </CardContent>
@@ -220,17 +220,17 @@ export default function ReportPage() {
 
                 {/* Dashboard Tabs */}
                 <Tabs defaultValue={has999 ? "market" : "history"} className="space-y-6">
-                    <TabsList className="bg-white/50 backdrop-blur-md border border-slate-200 p-1.5 rounded-[1.5rem] h-16 shadow-sm flex w-full md:w-fit overflow-x-auto gap-1">
-                        <TabsTrigger value="market" className="flex-1 md:flex-none rounded-xl data-[state=active]:bg-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-orange-600/20 font-black px-8 h-full flex gap-3 transition-all">
-                            <Tag className="w-4 h-4 flex-shrink-0" /> <span className="whitespace-nowrap">{t('marketTab')}</span>
+                    <TabsList className="bg-white/50 backdrop-blur-md border border-slate-200 p-1.5 rounded-[1.5rem] h-14 md:h-16 shadow-sm flex w-full overflow-x-auto gap-1">
+                        <TabsTrigger value="market" className="flex-1 rounded-xl data-[state=active]:bg-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-orange-600/20 font-black px-3 md:px-8 h-full flex gap-1 md:gap-3 transition-all text-xs md:text-sm whitespace-nowrap">
+                            <Tag className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" /> {t('marketTab')}
                         </TabsTrigger>
-                        <TabsTrigger value="national" className="flex-1 md:flex-none rounded-xl data-[state=active]:bg-emerald-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-emerald-600/20 font-black px-8 h-full transition-all">
+                        <TabsTrigger value="national" className="flex-1 rounded-xl data-[state=active]:bg-emerald-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-emerald-600/20 font-black px-3 md:px-8 h-full transition-all text-xs md:text-sm whitespace-nowrap">
                             {t('nationalTab')}
                         </TabsTrigger>
-                        <TabsTrigger value="history" className="flex-1 md:flex-none rounded-xl data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-600/20 font-black px-8 h-full transition-all text-[12px] md:text-sm">
+                        <TabsTrigger value="history" className="flex-1 rounded-xl data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-600/20 font-black px-3 md:px-8 h-full transition-all text-xs md:text-sm whitespace-nowrap">
                             {t('historyTab')}
                         </TabsTrigger>
-                        <TabsTrigger value="specs" className="flex-1 md:flex-none rounded-xl data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-slate-900/20 font-black px-8 h-full transition-all">
+                        <TabsTrigger value="specs" className="flex-1 rounded-xl data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-slate-900/20 font-black px-3 md:px-8 h-full transition-all text-xs md:text-sm whitespace-nowrap">
                             {t('specsTab')}
                         </TabsTrigger>
                     </TabsList>
@@ -507,20 +507,20 @@ export default function ReportPage() {
             </div>
 
             {/* Floating UI Toolbar */}
-            <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-6 pointer-events-none">
-                <div className="bg-slate-950/95 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] p-5 flex items-center justify-between shadow-2xl pointer-events-auto ring-1 ring-white/5">
-                    <div className="flex items-center gap-6 ml-6">
+            <div className="fixed bottom-4 md:bottom-10 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-3 md:px-6 pointer-events-none">
+                <div className="bg-slate-950/95 backdrop-blur-3xl border border-white/10 rounded-[2rem] md:rounded-[2.5rem] p-3 md:p-5 flex items-center justify-between shadow-2xl pointer-events-auto ring-1 ring-white/5">
+                    <div className="flex items-center gap-3 md:gap-6 ml-2 md:ml-6">
                         <div className="relative">
-                            <div className="w-4 h-4 bg-emerald-500 rounded-full animate-ping opacity-25"></div>
-                            <div className="w-4 h-4 bg-emerald-500 rounded-full absolute inset-0 shadow-[0_0_15px_rgba(16,185,129,0.5)]"></div>
+                            <div className="w-3 h-3 md:w-4 md:h-4 bg-emerald-500 rounded-full animate-ping opacity-25"></div>
+                            <div className="w-3 h-3 md:w-4 md:h-4 bg-emerald-500 rounded-full absolute inset-0 shadow-[0_0_15px_rgba(16,185,129,0.5)]"></div>
                         </div>
                         <div className="space-y-0.5">
-                            <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] leading-none">{t('dbStatus')}</p>
-                            <p className="text-sm font-black text-white italic tracking-widest">{t('liveConnection')}</p>
+                            <p className="text-[8px] md:text-[10px] font-black text-white/30 uppercase tracking-[0.3em] leading-none">{t('dbStatus')}</p>
+                            <p className="text-xs md:text-sm font-black text-white italic tracking-widest">{t('liveConnection')}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <Button className="bg-white hover:bg-slate-100 text-slate-950 font-black rounded-2xl px-12 h-14 shadow-lg transition-all active:scale-95 text-lg">
+                        <Button className="bg-white hover:bg-slate-100 text-slate-950 font-black rounded-xl md:rounded-2xl px-6 md:px-12 h-11 md:h-14 shadow-lg transition-all active:scale-95 text-sm md:text-lg">
                             {t('download')}
                         </Button>
                     </div>
