@@ -1,0 +1,191 @@
+{
+    "HomePage": {
+        "title": "Check car history with AI",
+        "subtitle": "Enter the VIN code to receive a detailed report and advice from our AI assistant.",
+        "inputPlaceholder": "Enter VIN code (17 characters)",
+        "cta": "Scan vehicle with AI",
+        "rehook": "Scan another VIN",
+        "freeTier": "We extract basic data for free."
+    },
+    "WhyCheck": {
+        "title": "Why smart buyers start with VYN.md",
+        "subtitle": "A history report is the first step towards a safe and profitable purchase.",
+        "points": [
+            {
+                "title": "Avoid costly mistakes",
+                "description": "Identify previous damages, clocked odometers, or hidden issues in time."
+            },
+            {
+                "title": "Find the right car",
+                "description": "Check car information online and only inspect those that are truly worth it."
+            },
+            {
+                "title": "Pay less",
+                "description": "Use information to get a better price or negotiate with clear arguments."
+            }
+        ]
+    },
+    "DataPoints": {
+        "title": "What type of data you get",
+        "subtitle": "We scan international and local databases to provide a complete report.",
+        "items": [
+            "Recorded images",
+            "Damage history",
+            "Theft records",
+            "Odometer readings",
+            "Specs & equipment",
+            "Taxes & emissions",
+            "Market value",
+            "Financial restrictions"
+        ]
+    },
+    "HowItWorks": {
+        "title": "How it works",
+        "steps": [
+            {
+                "title": "Enter the VIN",
+                "description": "Enter the 17-character code of the car you want to check."
+            },
+            {
+                "title": "We analyze data",
+                "description": "We scan over 900 data sources from over 45 countries."
+            },
+            {
+                "title": "Pay and unlock",
+                "description": "After payment, you receive the full report and AI advice in 55 seconds."
+            },
+            {
+                "title": "Make the right decision",
+                "description": "Use the report to decide if you move forward with the purchase."
+            }
+        ]
+    },
+    "Pricing": {
+        "title": "Choose the right pack",
+        "standard": {
+            "name": "1 Report",
+            "price": "1 MDL",
+            "description": "Perfect for testing.",
+            "cta": "Buy now"
+        },
+        "value": {
+            "name": "2 Reports",
+            "price": "1 MDL",
+            "description": "Save 100%. Perfect for testing.",
+            "cta": "Buy package"
+        }
+    },
+    "FAQ": {
+        "title": "Frequently Asked Questions",
+        "items": [
+            {
+                "question": "What is a VIN code?",
+                "answer": "The Vehicle Identification Number (VIN) is a unique 17-character code that serves as the car's fingerprint."
+            },
+            {
+                "question": "Where does the data come from?",
+                "answer": "We collect data from state registries, insurance companies, car auctions, and international databases."
+            }
+        ]
+    },
+    "Footer": {
+        "rights": "© 2026 VYN.md. All rights reserved.",
+        "terms": "Terms and conditions",
+        "privacy": "Privacy policy"
+    },
+    "Teaser": {
+        "title": "Vehicle Found!",
+        "subtitle": "We found historical records for",
+        "phoneLabel": "Enter WhatsApp or Phone Number",
+        "phonePlaceholder": "060 000 000",
+        "cta": "Unlock AI Report — 1 MDL",
+        "footer": "100% Automated • Secure Payment via Paynet"
+    },
+    "VinScanner": {
+        "placeholder": "ENTER VIN CODE (17 CHARACTERS)",
+        "cta": "CHECK NOW",
+        "invalidVin": "Invalid VIN. Enter 17 characters (no I, O, Q).",
+        "carNotFound": "Car not found. Check the VIN.",
+        "techError": "Technical error. Try again.",
+        "paymentInitError": "Could not initiate payment. Try again.",
+        "identifying": "Identifying vehicle",
+        "searchingDb": "Searching NHTSA database...",
+        "tryOther": "TRY ANOTHER VIN",
+        "vehicleFound": "VEHICLE IDENTIFIED",
+        "countryOrigin": "Country of Origin",
+        "continueCheck": "CONTINUE CHECK",
+        "readyToReport": "We are ready to generate the report",
+        "checkingSources": "Checking records from: Moldova (ASP), Border, EU/US Damages, and 999.md",
+        "promoPrice": "Promo Price",
+        "paySecure": "PAY SECURELY",
+        "secureBy": "Secured by Paynet MD. You receive the report instantly PDF and Web."
+    },
+    "Report": {
+        "reportUnavailable": "Report unavailable",
+        "notFoundMsg": "We could not find records for this VIN or the code is invalid.",
+        "retrySearch": "RETRY SEARCH",
+        "checkOther": "CHECK ANOTHER VIN",
+        "officialReport": "Official Report",
+        "dbSyncOk": "DATABASE_SYNC: OK",
+        "active999": "999.MD ACTIVE",
+        "extrasPlus": "EXTRAS_PLUS",
+        "securityScore": "Security Score",
+        "verifiedData": "Verified Data",
+        "scoreCalc": "Calculation based on technical data, sales history, and state registry.",
+        "marketTab": "LOCAL MARKET",
+        "nationalTab": "MOLDOVA (Gov)",
+        "historyTab": "TIMELINE",
+        "specsTab": "SPECS",
+        "presence999": "Presence on 999.md",
+        "autoIdent": "Real-time automatic identification",
+        "avgPrice": "Estimated Average Price",
+        "activeAd": "Active Ad",
+        "posted": "Posted",
+        "open": "OPEN",
+        "noAds": "No automatic ads",
+        "manualSearch": "Official 999.md sources may apply temporary scanning restrictions. Use direct search for final confirmation.",
+        "searchManual": "SEARCH MANUALLY ON 999.MD",
+        "gallery": "Photo Gallery",
+        "galleryHintActive": "View photos from the identified ad",
+        "galleryHintInactive": "Images become available when an active ad is identified",
+        "viewGallery": "VIEW GALLERY",
+        "paymentMethods": "Verified Payment Methods",
+        "registryASP": "ASP Registry",
+        "statusOfficial": "Official status up to date",
+        "bodyColor": "Body Color",
+        "regMD": "MD Registration",
+        "opDesc": "Operation Description",
+        "techInspection": "Technical Inspection (Certified)",
+        "kmRecorded": "RECORDED KILOMETERS",
+        "expCertificate": "Certificate Expiry",
+        "borderFlow": "Border Flow",
+        "noRecordRM": "No records in RM",
+        "noRecordDesc": "Vehicle does not appear in ASP or Border Police database. The car was not registered locally and did not officially cross the border under this VIN.",
+        "digitalHistory": "Digital Timeline",
+        "limitedHistory": "Limited global history",
+        "noEvents": "No events found in international data sources.",
+        "deepScan": "Deep Machine Scan",
+        "advTechAnalysis": "Advanced Technical Analysis",
+        "unlockData": "Unlock the full technical data set (150+ parameters). Get details about safety, specific components, and original assembly data.",
+        "processing": "PROCESSING...",
+        "unlockAll": "UNLOCK ALL",
+        "dbStatus": "Database Status",
+        "liveConnection": "LIVE_CONNECTION_v1.2",
+        "download": "DOWNLOAD",
+        "accessingDb": "Accessing databases..."
+    },
+    "PaymentSuccess": {
+        "generatingReport": "Generating AI Report...",
+        "analyzingHistory": "We are analyzing vehicle history in over 900 databases.",
+        "paymentConfirmed": "Payment Confirmed!",
+        "reportReady": "Your report is ready. We found information about damages, mileage, and sales history.",
+        "transNum": "Transaction Number / VIN",
+        "viewFullReport": "View Full Report",
+        "dontClose": "Please do not close this window",
+        "sentWhatsapp": "A copy of the report was sent to WhatsApp"
+    },
+    "Common": {
+        "loading": "Loading...",
+        "error": "An error occurred."
+    }
+}

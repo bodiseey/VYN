@@ -1,0 +1,191 @@
+{
+    "HomePage": {
+        "title": "Verifică istoricul mașinii cu AI",
+        "subtitle": "Introdu codul VIN pentru a primi un raport detaliat și sfaturi de la asistentul nostru AI.",
+        "inputPlaceholder": "Introdu codul VIN (17 caractere)",
+        "cta": "Scanează vehiculul cu AI",
+        "rehook": "Scanează alt VIN",
+        "freeTier": "Extragem datele de bază gratuit."
+    },
+    "WhyCheck": {
+        "title": "De ce cumpărătorii înțelepți încep cu VYN.md",
+        "subtitle": "Un raport de istoric este primul pas spre o achiziție sigură și profitabilă.",
+        "points": [
+            {
+                "title": "Evită greșelile costisitoare",
+                "description": "Identifică din timp daunele anterioare, kilometrajele date înapoi sau problemele ascunse."
+            },
+            {
+                "title": "Găsește mașina potrivită",
+                "description": "Verifică online informații despre mașini și inspectează-le doar pe cele care merită cu adevărat."
+            },
+            {
+                "title": "Plătește mai puțin",
+                "description": "Folosește-te de informații ca să obții un preț mai bun sau să negociezi cu argumente clare."
+            }
+        ]
+    },
+    "DataPoints": {
+        "title": "Ce tip de date primești",
+        "subtitle": "Scanăm baze de date internaționale și locale pentru a-ți oferi un raport complet.",
+        "items": [
+            "Imagini înregistrate",
+            "Istoric daune",
+            "Înregistrări de furt",
+            "Derulări de kilometraj",
+            "Specificații & echipare",
+            "Taxe și emisii",
+            "Valoarea de piață",
+            "Restricții financiare"
+        ]
+    },
+    "HowItWorks": {
+        "title": "Cum funcționează",
+        "steps": [
+            {
+                "title": "Introdu VIN-ul",
+                "description": "Introdu codul de 17 caractere al mașinii pe care vrei să o verifici."
+            },
+            {
+                "title": "Analizăm datele",
+                "description": "Scanăm peste 900 de surse de date din peste 45 de țări."
+            },
+            {
+                "title": "Plătește și deblochează",
+                "description": "După plată, primești raportul complet și sfaturile AI-ului în 55 de secunde."
+            },
+            {
+                "title": "Ia decizia corectă",
+                "description": "Folosește raportul pentru a decide dacă mergi mai departe cu achiziția."
+            }
+        ]
+    },
+    "Pricing": {
+        "title": "Alege pachetul potrivit",
+        "standard": {
+            "name": "1 Raport",
+            "price": "1 MDL",
+            "description": "Ideal pentru testare.",
+            "cta": "Cumpără acum"
+        },
+        "value": {
+            "name": "2 Rapoarte",
+            "price": "1 MDL",
+            "description": "Economisește 100%. Ideal pentru testare.",
+            "cta": "Cumpără pachetul"
+        }
+    },
+    "FAQ": {
+        "title": "Întrebări frecvente",
+        "items": [
+            {
+                "question": "Ce este un cod VIN?",
+                "answer": "Numărul de identificare al vehiculului (VIN) este un cod unic de 17 caractere care servește drept amprentă a mașinii."
+            },
+            {
+                "question": "De unde provin datele?",
+                "answer": "Colectăm date din registre de stat, companii de asigurări, licitații auto și baze de date internaționale."
+            }
+        ]
+    },
+    "Footer": {
+        "rights": "© 2026 VYN.md. Toate drepturile rezervate.",
+        "terms": "Termeni și condiții",
+        "privacy": "Politica de confidențialitate"
+    },
+    "Teaser": {
+        "title": "Vehicul Găsit!",
+        "subtitle": "Am găsit înregistrări istorice pentru",
+        "phoneLabel": "Introdu numărul de WhatsApp sau Telefon",
+        "phonePlaceholder": "060 000 000",
+        "cta": "Deblochează Raportul AI — 1 MDL",
+        "footer": "100% Automatizat • Plată Securizată prin Paynet"
+    },
+    "VinScanner": {
+        "placeholder": "INTRODU CODUL VIN (17 CARACTERE)",
+        "cta": "VERIFICĂ ACUM",
+        "invalidVin": "VIN invalid. Introdu 17 caractere (fără I, O, Q).",
+        "carNotFound": "Mașina nu a fost găsită. Verifică VIN-ul.",
+        "techError": "Eroare tehnică. Încearcă din nou.",
+        "paymentInitError": "Nu s-a putut iniția plata. Încearcă din nou.",
+        "identifying": "Identificăm vehiculul",
+        "searchingDb": "Căutăm în baza de date NHTSA...",
+        "tryOther": "ÎNCEARCĂ ALT VIN",
+        "vehicleFound": "VEHICUL IDENTIFICAT",
+        "countryOrigin": "Țară Origine",
+        "continueCheck": "CONTINUĂ VERIFICAREA",
+        "readyToReport": "Suntem gata să generăm raportul",
+        "checkingSources": "Verificăm înregistrări din: Moldova (ASP), Frontieră, Daune EU/US și 999.md",
+        "promoPrice": "Preț Promoțional",
+        "paySecure": "ACHITĂ SECURIZAT",
+        "secureBy": "Securizat prin Paynet MD. Primești raportul instant PDF și Web."
+    },
+    "Report": {
+        "reportUnavailable": "Raport indisponibil",
+        "notFoundMsg": "Nu am putut găsi înregistrările pentru acest VIN sau codul este invalid.",
+        "retrySearch": "REÎNCEARCĂ CĂUTAREA",
+        "checkOther": "VERIFICĂ ALT VIN",
+        "officialReport": "Official Report",
+        "dbSyncOk": "DATABASE_SYNC: OK",
+        "active999": "999.MD ACTIVE",
+        "extrasPlus": "EXTRAS_PLUS",
+        "securityScore": "Security Score",
+        "verifiedData": "Verified Data",
+        "scoreCalc": "Calcul bazat pe datele tehnice, istoricul de vânzări și registry-ul de stat.",
+        "marketTab": "PIAȚA LOCALĂ",
+        "nationalTab": "MOLDOVA (Gov)",
+        "historyTab": "CRONOLOGIE",
+        "specsTab": "SPECIFICAȚII",
+        "presence999": "Prezență pe 999.md",
+        "autoIdent": "Identificări automate în timp real",
+        "avgPrice": "Preț Mediu Estimat",
+        "activeAd": "Anunț Activ",
+        "posted": "Postat",
+        "open": "DESCHIDE",
+        "noAds": "Fără anunțuri automate",
+        "manualSearch": "Sursele oficiale 999.md pot aplica restricții temporare de scanare. Utilizează căutarea directă pentru confirmare finală.",
+        "searchManual": "CAUTĂ MANUAL PE 999.MD",
+        "gallery": "Galerie Foto",
+        "galleryHintActive": "Vizualizează fotografiile din anunțul identificat",
+        "galleryHintInactive": "Imaginile devin disponibile la identificarea unui anunț activ",
+        "viewGallery": "VEZI GALERIA",
+        "paymentMethods": "Metode Plată Verificate",
+        "registryASP": "Registru ASP",
+        "statusOfficial": "Status oficial la zi",
+        "bodyColor": "Culoare Caroserie",
+        "regMD": "Înmatriculare MD",
+        "opDesc": "Descrierea Operațiunii",
+        "techInspection": "Revizie Tehnică (Certificată)",
+        "kmRecorded": "KILOMETRI ÎNREGISTRAȚI",
+        "expCertificate": "Expirare Certificat",
+        "borderFlow": "Flux Frontieră",
+        "noRecordRM": "Nicio înregistrare în RM",
+        "noRecordDesc": "Vehiculul nu figurează în baza de date ASP sau a Poliției de Frontieră. Mașina nu a fost înmatriculată local și nu a trecut oficial granița sub acest VIN.",
+        "digitalHistory": "Cronologie Digitală",
+        "limitedHistory": "Istoric global limitat",
+        "noEvents": "Nu s-au găsit evenimente raportate în sursele de date internaționale.",
+        "deepScan": "Deep Machine Scan",
+        "advTechAnalysis": "Analiză Tehnică Avansată",
+        "unlockData": "Deblochează setul complet de date tehnice (150+ parametri). Obține detalii despre siguranță, componente specifice și date de asamblare originale.",
+        "processing": "PROCESĂM...",
+        "unlockAll": "DEBLOCHEAZĂ TOT",
+        "dbStatus": "Database Status",
+        "liveConnection": "LIVE_CONNECTION_v1.2",
+        "download": "DOWNLOAD",
+        "accessingDb": "Accesăm bazele de date..."
+    },
+    "PaymentSuccess": {
+        "generatingReport": "Generăm Raportul AI...",
+        "analyzingHistory": "Analizăm istoricul vehiculului în peste 900 de baze de date.",
+        "paymentConfirmed": "Plată Confirmată!",
+        "reportReady": "Raportul tău este gata. Am găsit informații despre daune, kilometraj și istoric vânzări.",
+        "transNum": "Număr Tranzacție / VIN",
+        "viewFullReport": "Vezi Raportul Complet",
+        "dontClose": "Vă rugăm nu închideți această fereastră",
+        "sentWhatsapp": "O copie a raportului a fost trimisă pe WhatsApp"
+    },
+    "Common": {
+        "loading": "Se încarcă...",
+        "error": "A apărut o eroare."
+    }
+}

@@ -1,0 +1,36 @@
+{ 
+	"Invoice":214454,
+	"MerchantCode":"975860",
+	"LinkUrlSuccess":"http://localhost:8080/psp/ok?id=1597822954534",
+	"LinkUrlCancel":"http://localhost:8080/psp/cancel?id=1597822954534",
+	"Signature":null,
+	"SignVersion":"v01",
+	"Customer":{
+		"Code":"o.stoianov@paynet.md",
+		"Name":"Oleg",
+		"NameFirst":"Firs Oleg",
+		"NameLast":"Name last ",
+		"email":"o.stoianov@paynet.md",
+		"Country":"Moldova",
+		"City": "Chisinau",
+		"Address":"www.paynet.md",
+		"PhoneNumber":"79306530"
+		
+	},
+		"Payer":null,
+		"Currency":498,
+		"ExternalDate":"2020-08-19T10:42:34",
+		"ExpiryDate":"2020-08-19T13:42:34",
+		"Services":[
+			{"Name":"Demo eshop",
+			"Description":"Demo eShop online desc",
+			"Amount":6550,
+			"Products":[
+				{"GroupName":null,"QualitiesConcat":null,"LineNo":1,"GroupId":null,"Code":"code1001","Barcode":1001,"Name":"Ticket mini","Description":"Description your product MINI","UnitPrice":2000,"UnitProduct":null,"Quantity":200,"Amount":null,"Dimensions":null,"Qualities":null,"TotalAmount":4000},
+				{"GroupName":null,"QualitiesConcat":null,"LineNo":2,"GroupId":null,"Code":"code1002","Barcode":1002,"Name":"Ticket MAX","Description":"Description your product MAX","UnitPrice":1050,"UnitProduct":null,"Quantity":100,"Amount":null,"Dimensions":null,"Qualities":null,"TotalAmount":1050},
+				{"GroupName":null,"QualitiesConcat":null,"LineNo":3,"GroupId":null,"Code":"code1003","Barcode":1003,"Name":"Ticket MAX 3","Description":"Description your product MAX","UnitPrice":500,"UnitProduct":null,"Quantity":300,"Amount":null,"Dimensions":null,"Qualities":null,"TotalAmount":1500}
+				]	}
+			],
+			"MoneyType":null
+	
+}
