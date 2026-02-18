@@ -10,9 +10,10 @@ export async function POST(req: NextRequest) {
         }
 
         const verdict = await generateAIVerdict(ctx);
-        return NextResponse.json({ success: true, verdict });
-    } catch (error) {
+        const hasKey = !!process.env.GEMINI_API_KEY;
+        return NextResponse.json({ success: true, verdict, debug_key_present: hasKey });
+    } catch (error: any) {
         console.error('[AI Verdict API Error]', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        return NextResponse.json({ error: 'Internal Server Error', details: error?.message }, { status: 500 });
     }
 }

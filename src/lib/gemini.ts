@@ -1,6 +1,6 @@
 /**
  * VYN.md — Gemini AI Brain
- * Senior Automotive Consultant powered by Google Gemini 2.0 Flash
+ * Senior Automotive Consultant powered by Google Gemini
  */
 
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
@@ -18,6 +18,9 @@ RULES:
 - Respond in the SAME LANGUAGE the user writes in (Romanian, Russian, or English).
 - Keep responses concise and structured. Use bullet points for clarity.
 - When giving a verdict, always end with one of: 🟢 SIGUR, 🟡 NECESITĂ VERIFICARE, or 🔴 EVITAȚI (or their equivalents in the user's language).`;
+
+// gemini-flash-lite-latest: confirmed working on Free Tier
+const GEMINI_MODEL = 'gemini-flash-lite-latest';
 
 export interface VehicleContext {
     vin: string;
@@ -42,7 +45,7 @@ export interface AIVerdict {
     summary: string;
     keyPoints: string[];
     recommendation: string;
-    confidence: number; // 0-100
+    confidence: number;
 }
 
 export interface ChatMessage {
@@ -93,7 +96,7 @@ export async function generateAIVerdict(ctx: VehicleContext): Promise<AIVerdict>
     try {
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
-            model: 'gemini-2.0-flash',
+            model: GEMINI_MODEL,
             systemInstruction: SYSTEM_PROMPT,
             safetySettings: [
                 { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
@@ -106,12 +109,12 @@ export async function generateAIVerdict(ctx: VehicleContext): Promise<AIVerdict>
 Analyze this vehicle and provide a structured JSON verdict. Respond ONLY with valid JSON, no markdown, no extra text:
 
 {
-  "rating": "green" | "yellow" | "red",
-  "title": "Short verdict title (max 8 words)",
+  "rating": "green",
+  "title": "Short verdict title max 8 words",
   "summary": "2-3 sentence overall assessment",
   "keyPoints": ["point 1", "point 2", "point 3", "point 4"],
-  "recommendation": "Clear action recommendation for the buyer (1-2 sentences)",
-  "confidence": <number 0-100 based on data completeness>
+  "recommendation": "Clear action recommendation for the buyer 1-2 sentences",
+  "confidence": 75
 }
 
 Rating guide:
@@ -124,22 +127,22 @@ Respond in Romanian language.`;
         const result = await model.generateContent(prompt);
         const text = result.response.text().trim();
 
-        // Extract JSON from response (handle markdown code blocks too)
-        const jsonMatch = text.match(/```json\s*([\s\S]*?)```/) || text.match(/\{[\s\S]*\}/);
+        // Extract JSON - handle both raw JSON and markdown code blocks
+        const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/) || text.match(/(\{[\s\S]*\})/);
         const jsonStr = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : null;
-        if (!jsonStr) throw new Error('No JSON in response');
+        if (!jsonStr) throw new Error('No JSON in response: ' + text.substring(0, 200));
 
-        const parsed = JSON.parse(jsonStr);
+        const parsed = JSON.parse(jsonStr.trim());
         return {
-            rating: parsed.rating || 'yellow',
-            title: parsed.title || 'Analiză incompletă',
+            rating: ['green', 'yellow', 'red'].includes(parsed.rating) ? parsed.rating : 'yellow',
+            title: parsed.title || 'Analiză completă',
             summary: parsed.summary || '',
-            keyPoints: parsed.keyPoints || [],
+            keyPoints: Array.isArray(parsed.keyPoints) ? parsed.keyPoints : [],
             recommendation: parsed.recommendation || '',
-            confidence: parsed.confidence || 50
+            confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 50
         };
-    } catch (e) {
-        console.error('[Gemini Verdict Error]', e);
+    } catch (e: any) {
+        console.error('[Gemini Verdict Error]', e?.message || e);
         return getFallbackVerdict();
     }
 }
@@ -160,7 +163,7 @@ export async function chatWithAI(
     try {
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
-            model: 'gemini-2.0-flash',
+            model: GEMINI_MODEL,
             systemInstruction: SYSTEM_PROMPT,
         });
 
@@ -185,8 +188,8 @@ export async function chatWithAI(
 
         const result = await chat.sendMessage(message);
         return result.response.text();
-    } catch (e) {
-        console.error('[Gemini Chat Error]', e);
+    } catch (e: any) {
+        console.error('[Gemini Chat Error]', e?.message || e);
         return 'A apărut o eroare la procesarea întrebării. Te rugăm să încerci din nou.';
     }
 }
