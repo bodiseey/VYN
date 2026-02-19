@@ -1,34 +1,27 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search,
     ShieldCheck,
     AlertCircle,
     ChevronRight,
-    Loader2,
     CheckCircle2,
-    Zap,
-    Smartphone,
-    CreditCard,
-    QrCode,
-    Camera,
-    Info,
     Car
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { getBrandLogo } from '@/lib/brand-utils';
+import DatabaseScanner from '@/components/DatabaseScanner';
+import { useLocale, useTranslations } from 'next-intl';
 
 interface VinScannerProps {
     placeholder?: string;
     cta?: string;
     rehook?: boolean;
 }
-
-import { useLocale, useTranslations } from 'next-intl';
 
 export default function VinScanner({ placeholder, cta, rehook }: VinScannerProps) {
     const t = useTranslations('VinScanner');
@@ -37,6 +30,9 @@ export default function VinScanner({ placeholder, cta, rehook }: VinScannerProps
     const [status, setStatus] = useState<'idle' | 'scanning' | 'found' | 'error' | 'hook'>('idle');
     const [vehicle, setVehicle] = useState<any>(null);
     const [error, setError] = useState('');
+    // Holds the real API promise so DatabaseScanner can wait for it
+    const apiPromiseRef = useRef<Promise<any> | null>(null);
+    const vehicleRef = useRef<any>(null);
 
     const validateVin = (v: string) => {
         const clean = v.toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -54,23 +50,32 @@ export default function VinScanner({ placeholder, cta, rehook }: VinScannerProps
             return;
         }
 
-        setStatus('scanning');
         setError('');
 
-        try {
-            const res = await fetch(`/api/vin/scan?vin=${cleanVin}`);
-            const data = await res.json();
+        // Create the API promise BEFORE showing the scanner
+        const promise = fetch(`/api/vin/scan?vin=${cleanVin}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.success && data.Make) {
+                    vehicleRef.current = data;
+                    setVin(cleanVin);
+                    setVehicle(data);
+                }
+                return data;
+            })
+            .catch(() => null);
 
-            if (data.success && data.Make) {
-                setVin(cleanVin);
-                setVehicle(data);
-                setTimeout(() => setStatus('found'), 1500);
-            } else {
-                setError(data.error || t('carNotFound'));
-                setStatus('error');
-            }
-        } catch (err) {
-            setError(t('techError'));
+        apiPromiseRef.current = promise;
+        setStatus('scanning');
+    };
+
+    // Called by DatabaseScanner when its sequence + API both complete
+    const handleScannerComplete = async () => {
+        const data = await apiPromiseRef.current;
+        if (data?.success && data?.Make) {
+            setStatus('found');
+        } else {
+            setError(data?.error || t('carNotFound'));
             setStatus('error');
         }
     };
@@ -178,21 +183,12 @@ export default function VinScanner({ placeholder, cta, rehook }: VinScannerProps
                         </div>
                     </motion.div>
                 ) : status === 'scanning' ? (
-                    <motion.div
-                        key="scanning"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="bg-white rounded-[2.5rem] p-12 shadow-2xl border border-slate-100 flex flex-col items-center text-center space-y-6"
-                    >
-                        <div className="w-20 h-20 relative">
-                            <div className="absolute inset-0 border-8 border-blue-50 rounded-full"></div>
-                            <div className="absolute inset-0 border-8 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
-                        </div>
-                        <div>
-                            <h3 className="text-2xl font-black text-slate-900 tracking-tighter uppercase">{t('identifying')}</h3>
-                            <p className="text-slate-500 font-bold animate-pulse uppercase text-xs tracking-widest mt-2">{t('searchingDb')}</p>
-                        </div>
-                    </motion.div>
+                    <DatabaseScanner
+                        key="scanner"
+                        vin={vin || 'UNKNOWN'}
+                        onComplete={handleScannerComplete}
+                        apiPromise={apiPromiseRef.current ?? undefined}
+                    />
                 ) : status === 'found' ? (
                     <motion.div
                         key="found"
