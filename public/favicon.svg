@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Blue rounded square background (iOS/Android app icon style) -->
+  <rect width="512" height="512" rx="110" fill="#2563EB"/>
+
+  <!--
+    VYN logo V-mark in white.
+    Shape: thick left arm with a rectangular flat cut at top-right,
+    right arm is a clean diagonal, both meet at bottom center point.
+    Traced proportionally from the brand logo.
+  -->
+  <path fill="white" d="
+    M 68,72
+    L 222,72
+    L 222,168
+    L 176,168
+    C 150,168 132,186 132,212
+    L 132,290
+    L 256,434
+    L 380,290
+    L 380,212
+    C 380,186 362,168 336,168
+    L 290,168
+    L 290,72
+    L 444,72
+    L 256,474
+    L 68,72
+    Z
+  "/>
+</svg>
