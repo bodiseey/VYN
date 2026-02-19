@@ -35,6 +35,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getFullVehicleReport, UnifiedReport } from '@/lib/report-service';
 import { motion, AnimatePresence } from 'framer-motion';
+export const dynamic = 'force-dynamic'; // Prevent stale builds
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { getBrandLogo } from '@/lib/brand-utils';
 

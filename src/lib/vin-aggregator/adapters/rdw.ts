@@ -133,7 +133,7 @@ export class RdwAdapter implements IVinDataSource {
             fetch(`${RDW_BASE}/${DS_RECALLS}.json?kenteken=${normalizedPlate}&$limit=10`, {
                 headers: this.headers(),
                 signal: AbortSignal.timeout(4000),
-                next: { revalidate: 3600 },
+                cache: 'no-store', // FORCE FRESH DATA
             }).then(r => r.ok ? r.json() : []).then((recalls: any[]) => {
                 recalled = recalls.length > 0;
                 recallDetails = recalls.map(r => r.referentiecode_rdw || 'N/A');

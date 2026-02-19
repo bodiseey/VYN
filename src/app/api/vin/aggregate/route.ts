@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { aggregateVinData } from '@/lib/vin-aggregator/aggregator';
 
 export const maxDuration = 30; // Allow up to 30s for all adapters
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
     const { searchParams } = req.nextUrl;
