@@ -154,44 +154,76 @@ async function search999md(vin: string) {
 export async function getFullVehicleReport(vin: string, extended: boolean = false): Promise<UnifiedReport> {
     const cleanVin = vin.toUpperCase().trim();
 
-    // 1. Fetch from REAL bases (NHTSA, 999, M-Connect)
-    const [nhtsaRes, mdData, marketListings, aggregatorRes] = await Promise.all([
-        fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${cleanVin}?format=json`).then(r => r.json()).catch(() => ({})),
+    // 1. Run Aggregator FIRST (It handles RDW, DVSA, NHTSA logic centrally)
+    const aggregatorRes = await import('./vin-aggregator/aggregator')
+        .then(m => m.aggregateVinData(cleanVin))
+        .catch(() => null);
+
+    // 2. Fetch locally relevant data (Moldova & Market) in parallel
+    const [mdData, marketListings] = await Promise.all([
         import('./mconnect').then(m => m.getNationalReportData(cleanVin)),
-        search999md(cleanVin),
-        import('./vin-aggregator/aggregator').then(m => m.aggregateVinData(cleanVin)).catch(() => null)
+        search999md(cleanVin)
     ]);
 
-    const results = nhtsaRes.Results || [];
-    const findNHTSA = (v: string) => results.find((r: any) => r.Variable === v)?.Value;
+    // 3. Determine Identity (Source of Truth Priority: RDW/DVSA > NHTSA)
+    // If aggregator successfully identified the car via RDW (Netherlands) or DVSA (UK), use that.
+    // Otherwise fallback to whatever NHTSA found (or didn't find).
 
-    // 2. Technical Extraction — translated to Romanian
-    const rawFuel = findNHTSA('Fuel Type - Primary');
-    const rawBody = findNHTSA('Body Class');
-    const rawDrive = findNHTSA('Drive Type');
-    const rawTransmission = findNHTSA('Transmission Style');
-    const rawCountry = findNHTSA('Plant Country');
-
-    const specs: Record<string, string> = {
-        'Țară Origine': translateValue(COUNTRY_RO, rawCountry) || 'N/A',
-        'Motor': findNHTSA('Displacement (L)') ? `${findNHTSA('Displacement (L)')}L ${findNHTSA('Engine Number of Cylinders') || ''} Cil.` : 'N/A',
-        'Putere (CP)': findNHTSA('Engine HP') ? `${findNHTSA('Engine HP')} CP` : 'N/A',
-        'Combustibil': translateValue(FUEL_TYPE_RO, rawFuel) || 'N/A',
-        'Caroserie': translateValue(BODY_CLASS_RO, rawBody) || 'N/A',
-        'Tracțiune': translateValue(DRIVE_TYPE_RO, rawDrive) || 'N/A',
-        'Transmisie': translateValue(TRANSMISSION_RO, rawTransmission) || 'N/A',
-        'An Fabricație': findNHTSA('Model Year') || 'N/A',
+    let vehicleIdentity = {
+        make: aggregatorRes?.identity?.make,
+        model: aggregatorRes?.identity?.model,
+        year: aggregatorRes?.identity?.year?.toString(),
+        country: aggregatorRes?.specs?.plantCountry || 'Unknown',
+        fuel: aggregatorRes?.specs?.engine?.fuelType,
+        engine: aggregatorRes?.specs?.engine?.displacement ? `${aggregatorRes.specs.engine.displacement}L` : null,
+        hp: aggregatorRes?.specs?.engine?.hp,
+        body: aggregatorRes?.identity?.bodyClass,
+        drive: aggregatorRes?.specs?.drivetrain,
+        trans: aggregatorRes?.specs?.transmission?.style
     };
 
-    // Extended specs — translate known values
+    // Fallback/Enhancement logic:
+    // If invalid NHTSA response but we have RDW data (Netherlands Plate)
+    if ((!vehicleIdentity.make || vehicleIdentity.make === 'Unknown') && aggregatorRes?.rdwData?.brand) {
+        vehicleIdentity.make = aggregatorRes.rdwData.brand;
+        vehicleIdentity.model = aggregatorRes.rdwData.model;
+        vehicleIdentity.year = aggregatorRes.rdwData.firstRegistration?.substring(0, 4); // 2020-01-01 -> 2020
+        vehicleIdentity.country = 'NETHERLANDS'; // It's from RDW
+        vehicleIdentity.fuel = aggregatorRes.rdwData.fuel;
+        // RDW specific specs
+        // engine/hp might be in raw rdw data, we can use that in future
+    }
+
+    // Nhtsa Raw for deep specs mapping (legacy support)
+    const nhtsaRaw = aggregatorRes?.raw?.nhtsa || {};
+    const findNHTSA = (v: string) => {
+        if (nhtsaRaw.Results) {
+            return nhtsaRaw.Results.find((r: any) => r.Variable === v)?.Value;
+        }
+        return null;
+    };
+
+    // Specs Map
+    const specs: Record<string, string> = {
+        'Țară Origine': translateValue(COUNTRY_RO, vehicleIdentity.country) || 'N/A',
+        'Motor': vehicleIdentity.engine || (aggregatorRes?.rdwData?.cylinderCapacity ? `${aggregatorRes.rdwData.cylinderCapacity} cc` : 'N/A'),
+        'Putere (CP)': vehicleIdentity.hp ? `${vehicleIdentity.hp} CP` : (aggregatorRes?.rdwData?.powerKw ? `${Math.round(aggregatorRes.rdwData.powerKw * 1.341)} CP` : 'N/A'),
+        'Combustibil': translateValue(FUEL_TYPE_RO, vehicleIdentity.fuel) || 'N/A',
+        'Caroserie': translateValue(BODY_CLASS_RO, vehicleIdentity.body) || (aggregatorRes?.rdwData?.bodyType || 'N/A'),
+        'Tracțiune': translateValue(DRIVE_TYPE_RO, vehicleIdentity.drive) || 'N/A',
+        'Transmisie': translateValue(TRANSMISSION_RO, vehicleIdentity.trans) || 'N/A',
+        'An Fabricație': vehicleIdentity.year || 'N/A',
+    };
+
+    // Extended specs (if NHTSA is present)
     let allSpecs: Record<string, string> = {};
-    if (extended) {
-        results.forEach((r: any) => {
+    if (extended && nhtsaRaw.Results) {
+        nhtsaRaw.Results.forEach((r: any) => {
             if (r.Value && !['Not Applicable', 'N/A', '', '0'].includes(r.Value)) {
                 allSpecs[r.Variable] = r.Value;
             }
         });
-        // Apply translations to extended specs too
+        // Translations...
         if (allSpecs['Fuel Type - Primary']) allSpecs['Fuel Type - Primary'] = translateValue(FUEL_TYPE_RO, allSpecs['Fuel Type - Primary']) || allSpecs['Fuel Type - Primary'];
         if (allSpecs['Body Class']) allSpecs['Body Class'] = translateValue(BODY_CLASS_RO, allSpecs['Body Class']) || allSpecs['Body Class'];
         if (allSpecs['Drive Type']) allSpecs['Drive Type'] = translateValue(DRIVE_TYPE_RO, allSpecs['Drive Type']) || allSpecs['Drive Type'];
@@ -199,8 +231,45 @@ export async function getFullVehicleReport(vin: string, extended: boolean = fals
         if (allSpecs['Plant Country']) allSpecs['Plant Country'] = translateValue(COUNTRY_RO, allSpecs['Plant Country']) || allSpecs['Plant Country'];
     }
 
-    // 3. Timeline Construction (ONLY REAL DATA)
+    // 3. Timeline Construction
     const history: any[] = [];
+
+    // RDW Events (Netherlands)
+    if (aggregatorRes?.rdwData) {
+        const rdw = aggregatorRes.rdwData;
+        if (rdw.firstRegistration) {
+            history.push({
+                date: rdw.firstRegistration,
+                type: 'ÎNMATRICULARE',
+                description: `Prima înmatriculare (Globală): ${rdw.firstRegistration}`,
+                location: 'Olanda'
+            });
+        }
+        if (rdw.firstRegistrationNL && rdw.firstRegistrationNL !== rdw.firstRegistration) {
+            history.push({
+                date: rdw.firstRegistrationNL,
+                type: 'IMPORT',
+                description: `Înregistrată în Olanda`,
+                location: 'Olanda'
+            });
+        }
+        if (rdw.apkExpiry) {
+            history.push({
+                date: rdw.apkExpiry,
+                type: 'ITP / APK',
+                description: `Expirare Inspecție Tehnică (APK)`,
+                location: 'Olanda'
+            });
+        }
+        if (rdw.recalled) {
+            history.push({
+                date: new Date().toISOString().split('T')[0],
+                type: 'RECALL',
+                description: `Există rechemări oficiale active pentru acest vehicul`,
+                location: 'RDW'
+            });
+        }
+    }
 
     // MD Official Data
     if (mdData.success) {
@@ -222,7 +291,7 @@ export async function getFullVehicleReport(vin: string, extended: boolean = fals
         }
     }
 
-    // Market Presence — only add to history if found
+    // Market Presence
     if (marketListings.length > 0) {
         marketListings.forEach((listing: any) => {
             history.push({
@@ -240,13 +309,13 @@ export async function getFullVehicleReport(vin: string, extended: boolean = fals
     const validPrices = marketListings.map((l: any) => parseFloat(l.price)).filter((p: number) => !isNaN(p) && p > 0);
     const calculatedAvg = validPrices.length > 0
         ? Math.round(validPrices.reduce((a: number, b: number) => a + b, 0) / validPrices.length)
-        : 0;
+        : (aggregatorRes?.rdwData?.cataloguePrice ? parseInt(aggregatorRes.rdwData.cataloguePrice.replace(/\D/g, '')) : 0);
 
     return {
         vin: cleanVin,
-        make: findNHTSA('Make') || 'Unknown',
-        model: findNHTSA('Model') || 'Unknown',
-        year: findNHTSA('Model Year') || 'N/A',
+        make: vehicleIdentity.make || 'Unknown',
+        model: vehicleIdentity.model || 'Unknown',
+        year: vehicleIdentity.year || 'N/A',
         specs,
         allSpecs: extended ? allSpecs : undefined,
         nationalData: mdData.success ? mdData : null,

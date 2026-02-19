@@ -152,7 +152,15 @@ export async function aggregateVinData(rawVin: string): Promise<UnifiedVehicleRe
                 apkExpiry: rdw.apkExpiry ?? null,
                 recalled: rdw.recalled ?? null,
                 brand: rdw.brand ?? null,
-                fuel: rdw.fuel ?? null,
+                model: rdw.model ?? null,
+                fuel: rdw.fuelType ?? null,
+                firstRegistrationNL: rdw.firstRegistrationNL ?? null,
+                cataloguePrice: rdw.cataloguePrice ?? null,
+                powerKw: rdw.powerKw ?? null,
+                cylinderCapacity: rdw.cylinderCapacity ?? null,
+                bodyType: rdw.bodyType ?? null,
+                export_indicator: rdw.exportedFlag ?? undefined,
+                wamStatus: rdw.wamStatus ?? undefined,
             }
             : null,
 

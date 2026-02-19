@@ -116,7 +116,7 @@ export const UnifiedVehicleReportSchema = z.object({
         })
         .nullable(),
 
-    /** Netherlands RDW Open Data (null if not found) */
+    /** Netherlands RDW Data */
     rdwData: z
         .object({
             licensePlate: z.string().nullable(),
@@ -125,7 +125,15 @@ export const UnifiedVehicleReportSchema = z.object({
             apkExpiry: z.string().nullable(),
             recalled: z.boolean().nullable(),
             brand: z.string().nullable(),
+            model: z.string().nullable(),
             fuel: z.string().nullable(),
+            firstRegistrationNL: z.string().nullable(),
+            cataloguePrice: z.string().nullable(),
+            powerKw: z.number().nullable(),
+            cylinderCapacity: z.number().nullable(),
+            bodyType: z.string().nullable(),
+            export_indicator: z.boolean().optional(),
+            wamStatus: z.boolean().optional(),
         })
         .nullable(),
 
