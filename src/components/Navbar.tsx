@@ -21,6 +21,7 @@ export default function Navbar() {
                             alt="VYN.md Logo"
                             fill
                             className="object-contain"
+                            style={{ filter: 'invert(27%) sepia(98%) saturate(1700%) hue-rotate(213deg) brightness(97%) contrast(103%)' }}
                             priority
                         />
                     </div>
