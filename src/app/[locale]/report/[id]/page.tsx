@@ -11,13 +11,11 @@ import {
     DollarSign,
     Camera,
     Download,
-    Share2,
     Clock,
     ExternalLink,
     Flag,
     Navigation,
     Tag,
-    Zap,
     Loader2,
     Image as ImageIcon,
     ArrowLeft,
@@ -25,7 +23,10 @@ import {
     CheckCircle2,
     Info,
     ShieldCheck,
-    ArrowRight
+    ArrowRight,
+    AlertOctagon,
+    ShieldAlert,
+    ShieldOff
 } from 'lucide-react';
 import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -54,6 +55,8 @@ export default function ReportPage() {
     const [downloading, setDownloading] = useState(false);
     const [report, setReport] = useState<UnifiedReport | null>(null);
     const [verdict, setVerdict] = useState<AIVerdict | null>(null);
+    const [recalls, setRecalls] = useState<any[] | null>(null);
+    const [recallsLoading, setRecallsLoading] = useState(false);
 
     useEffect(() => {
         setIsMounted(true);
@@ -66,6 +69,19 @@ export default function ReportPage() {
             try {
                 const data = await getFullVehicleReport(id);
                 setReport(data);
+                // Also fetch aggregator data for recalls (non-blocking)
+                setRecallsLoading(true);
+                fetch(`/api/vin/aggregate?vin=${id}`)
+                    .then(r => r.json())
+                    .then(agg => {
+                        if (agg.success && agg.report?.safety?.recalls?.length > 0) {
+                            setRecalls(agg.report.safety.recalls);
+                        } else {
+                            setRecalls([]);
+                        }
+                    })
+                    .catch(() => setRecalls([]))
+                    .finally(() => setRecallsLoading(false));
             } catch (error) {
                 console.error('Error loading report:', error);
             } finally {
@@ -307,12 +323,132 @@ export default function ReportPage() {
                         <TabsTrigger value="specs" className="flex-1 rounded-xl data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-slate-900/20 font-black px-3 md:px-8 h-full transition-all text-xs md:text-sm whitespace-nowrap">
                             {t('specsTab')}
                         </TabsTrigger>
+                        <TabsTrigger value="safety" className="flex-1 rounded-xl data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-red-600/20 font-black px-3 md:px-8 h-full flex items-center gap-1 md:gap-2 transition-all text-xs md:text-sm whitespace-nowrap">
+                            <ShieldAlert className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" />
+                            Siguranță
+                            {recalls && recalls.length > 0 && (
+                                <span className="ml-1 bg-red-500 text-white text-[9px] font-black rounded-full w-4 h-4 flex items-center justify-center flex-shrink-0">
+                                    {recalls.length > 9 ? '9+' : recalls.length}
+                                </span>
+                            )}
+                        </TabsTrigger>
                         {has999 && (
                             <TabsTrigger value="market" className="flex-1 rounded-xl data-[state=active]:bg-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-orange-600/20 font-black px-3 md:px-8 h-full flex gap-1 md:gap-3 transition-all text-xs md:text-sm whitespace-nowrap">
                                 <Tag className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" /> {t('marketTab')}
                             </TabsTrigger>
                         )}
                     </TabsList>
+
+                    {/* ── Safety & Recalls Tab ── */}
+                    <TabsContent value="safety" className="animate-in fade-in slide-in-from-bottom-4 duration-700 outline-none space-y-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                            {/* Recall list */}
+                            <div className="lg:col-span-2 space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h3 className="text-2xl font-black text-slate-900 tracking-tighter">Rechemări Oficiale NHTSA</h3>
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-0.5">National Highway Traffic Safety Administration · SUA</p>
+                                    </div>
+                                    {recalls && recalls.length > 0 && (
+                                        <span className="bg-red-100 text-red-700 font-black text-sm px-4 py-1.5 rounded-xl border border-red-200">
+                                            {recalls.length} rechemări
+                                        </span>
+                                    )}
+                                </div>
+
+                                {recallsLoading ? (
+                                    <div className="bg-white rounded-[2.5rem] p-16 flex items-center justify-center border border-slate-100 shadow-xl">
+                                        <div className="flex flex-col items-center gap-4">
+                                            <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
+                                            <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">Interogare NHTSA...</p>
+                                        </div>
+                                    </div>
+                                ) : recalls && recalls.length > 0 ? (
+                                    <div className="space-y-4">
+                                        {recalls.map((recall: any, i: number) => (
+                                            <div key={i} className="bg-white rounded-[2rem] p-6 border border-red-100 shadow-lg shadow-red-50 space-y-3">
+                                                <div className="flex items-start justify-between gap-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                                                            <AlertOctagon className="w-5 h-5 text-red-500" />
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-mono text-[10px] text-slate-400 font-bold uppercase tracking-widest">Campaign #{recall.campaign}</p>
+                                                            <p className="font-black text-slate-900 text-sm leading-tight">{recall.component}</p>
+                                                        </div>
+                                                    </div>
+                                                    <span className="flex-shrink-0 bg-red-50 text-red-600 font-black text-[9px] tracking-widest uppercase px-3 py-1 rounded-lg border border-red-100">
+                                                        ACTIV
+                                                    </span>
+                                                </div>
+                                                <p className="text-slate-600 text-sm font-medium leading-relaxed bg-slate-50 p-4 rounded-xl">{recall.summary}</p>
+                                                {recall.consequence && (
+                                                    <p className="text-orange-700 text-xs font-bold bg-orange-50 p-3 rounded-xl border border-orange-100">
+                                                        ⚠️ {recall.consequence}
+                                                    </p>
+                                                )}
+                                                {recall.remedy && (
+                                                    <p className="text-emerald-700 text-xs font-bold bg-emerald-50 p-3 rounded-xl border border-emerald-100">
+                                                        ✅ Remediu: {recall.remedy}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="bg-white rounded-[2.5rem] p-16 text-center border border-emerald-100 shadow-xl">
+                                        <CheckCircle2 className="w-20 h-20 text-emerald-400 mx-auto mb-6" />
+                                        <h4 className="text-2xl font-black text-slate-900 tracking-tighter uppercase mb-3">Nicio Rechemare Activă</h4>
+                                        <p className="text-slate-400 font-medium text-sm max-w-sm mx-auto leading-relaxed">
+                                            NHTSA nu a înregistrat rechemări active pentru acest model an/fabricant.
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Safety features panel */}
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-black text-slate-900 tracking-tighter">Sisteme de Siguranță</h3>
+                                {[
+                                    { label: 'ABS', desc: 'Blocare roți', icon: ShieldCheck, ok: true },
+                                    { label: 'ESC', desc: 'Control stabilitate', icon: ShieldCheck, ok: true },
+                                    { label: 'TPMS', desc: 'Presiune anvelope', icon: ShieldCheck, ok: true },
+                                    { label: 'Airbag Față', desc: 'Protecție frontală', icon: ShieldCheck, ok: true },
+                                ].map((feat, i) => (
+                                    <div key={i} className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex items-center gap-4">
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${feat.ok ? 'bg-emerald-50' : 'bg-slate-50'}`}>
+                                            {feat.ok
+                                                ? <ShieldCheck className="w-5 h-5 text-emerald-500" />
+                                                : <ShieldOff className="w-5 h-5 text-slate-300" />
+                                            }
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="font-black text-slate-900 text-sm">{feat.label}</p>
+                                            <p className="text-slate-400 text-xs font-medium">{feat.desc}</p>
+                                        </div>
+                                        <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg ${feat.ok ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-400'}`}>
+                                            {feat.ok ? 'STANDARD' : 'N/A'}
+                                        </span>
+                                    </div>
+                                ))}
+
+                                {/* NHTSA Link */}
+                                <a
+                                    href={`https://www.nhtsa.gov/vehicle/${report.make}/${report.model}/${report.year}/coupe`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center justify-between bg-slate-900 text-white rounded-2xl p-5 hover:bg-blue-700 transition-all group"
+                                >
+                                    <div>
+                                        <p className="font-black text-sm">NHTSA Safety Ratings</p>
+                                        <p className="text-slate-400 text-xs">nhtsa.gov</p>
+                                    </div>
+                                    <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" />
+                                </a>
+                            </div>
+                        </div>
+                    </TabsContent>
 
                     {/* Market Tab */}
                     <TabsContent value="market" className="animate-in fade-in slide-in-from-bottom-4 duration-700 outline-none">
@@ -561,7 +697,7 @@ export default function ReportPage() {
                         {!isExtended && (
                             <div className="bg-slate-900 rounded-[4rem] p-16 text-white flex flex-col lg:flex-row items-center justify-between gap-12 shadow-3xl relative overflow-hidden ring-1 ring-white/10 group">
                                 <div className="absolute top-0 right-0 p-24 opacity-5 group-hover:rotate-45 transition-transform duration-1000 scale-150">
-                                    <Zap className="w-64 h-64" />
+                                    <Loader2 className="w-64 h-64" />
                                 </div>
                                 <div className="relative z-10 space-y-6 max-w-2xl text-center lg:text-left">
                                     <Badge className="bg-blue-600 text-white border-none px-6 py-2 font-black text-[12px] tracking-[0.2em] uppercase rounded-full shadow-lg shadow-blue-600/20">{t('deepScan')}</Badge>
