@@ -4,8 +4,10 @@ import { fetchRdwData } from '@/lib/vin-aggregator/adapters/rdw';
 /**
  * Enhanced Scan Endpoint
  * Supports both VIN (17 chars) -> NHTSA
- * And Dutch Plate (4-8 chars) -> RDW
+ * And License Plates (4-8 chars) -> RDW (NL) / DVSA (UK)
  */
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const rawInput = searchParams.get('vin') || ''; // 'vin' param used for both

@@ -67,6 +67,7 @@ export default function DatabaseScanner({ vin, onComplete, apiPromise }: Props) 
     const [currentStep, setCurrentStep] = useState(0);
     const [progress, setProgress] = useState(0);
     const [done, setDone] = useState(false);
+    const [apiResponse, setApiResponse] = useState<any>(null);
     const [apiResolved, setApiResolved] = useState(false);
     const sequenceComplete = useRef(false);
 
@@ -74,8 +75,11 @@ export default function DatabaseScanner({ vin, onComplete, apiPromise }: Props) 
     useEffect(() => {
         if (apiPromise) {
             apiPromise
-                .then(() => setApiResolved(true))
-                .catch(() => setApiResolved(true)); // resolve either way
+                .then((data) => {
+                    setApiResponse(data);
+                    setApiResolved(true);
+                })
+                .catch(() => setApiResolved(true));
         } else {
             setApiResolved(true);
         }
@@ -95,7 +99,6 @@ export default function DatabaseScanner({ vin, onComplete, apiPromise }: Props) 
             const i = stepIndex;
             stepIndex++;
 
-            // Mark as scanning
             setSteps(prev =>
                 prev.map((s, idx) =>
                     idx === i ? { ...s, status: 'scanning' } : s
@@ -105,19 +108,28 @@ export default function DatabaseScanner({ vin, onComplete, apiPromise }: Props) 
 
             setTimeout(() => {
                 if (cancelled) return;
-                // Mark as complete with a realistic result
-                const result: ScanStep['status'] =
-                    i === 2 ? 'skipped' : // RDW shows as skipped (needs plate)
-                        i === 3 ? 'success' :  // AIDA — no record = good news
-                            'success';
 
-                const badge =
-                    i === 0 ? 'NHTSA CLEAR' :
-                        i === 1 ? 'NO UK MOT' :
-                            i === 2 ? 'PLATE REQUIRED' :
-                                i === 3 ? 'NO INCIDENTS' :
-                                    i === 4 ? 'CLEAR' :
-                                        'DATA FOUND';
+                // Determine dynamic badge and status
+                let badge = '';
+                let result: ScanStep['status'] = 'success';
+
+                if (i === 0) { // NHTSA
+                    badge = apiResponse?.source === 'NHTSA' || apiResponse?.Make ? 'NHTSA CLEAR' : 'NO US RECORD';
+                } else if (i === 1) { // DVSA
+                    const isUk = apiResponse?.source === 'DVSA' || apiResponse?.PlantCountry === 'UNITED KINGDOM';
+                    badge = isUk ? 'UK MOT FOUND' : 'NO UK MOT';
+                    result = isUk ? 'success' : 'skipped';
+                } else if (i === 2) { // RDW
+                    const isNl = apiResponse?.source === 'RDW' || apiResponse?.PlantCountry === 'NETHERLANDS';
+                    badge = isNl ? 'RDW FOUND' : 'PLATE REQUIRED';
+                    result = isNl ? 'success' : 'skipped';
+                } else if (i === 3) {
+                    badge = 'NO INCIDENTS';
+                } else if (i === 4) {
+                    badge = 'CLEAR';
+                } else {
+                    badge = apiResponse?.success ? 'DATA FOUND' : 'NOT FOUND';
+                }
 
                 setSteps(prev =>
                     prev.map((s, idx) =>
@@ -125,18 +137,15 @@ export default function DatabaseScanner({ vin, onComplete, apiPromise }: Props) 
                     )
                 );
 
-                // Update progress
                 const newProgress = Math.round(((i + 1) / INITIAL_STEPS.length) * 100);
                 setProgress(newProgress);
-
-                // Run the next step
                 runNext();
             }, STEP_DURATIONS[i]);
         };
 
         runNext();
         return () => { cancelled = true; };
-    }, []);
+    }, [apiResponse]);
 
     // When BOTH the visual sequence AND the API are done — hand off
     useEffect(() => {
@@ -253,14 +262,14 @@ function StepRow({
             animate={{ opacity: isPending ? 0.4 : 1 }}
             transition={{ duration: 0.3 }}
             className={`flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border transition-all duration-300 ${isScanning
-                    ? 'bg-blue-950/50 border-blue-700/40'
-                    : isSuccess
-                        ? 'bg-emerald-950/30 border-emerald-800/30'
-                        : isSkipped
-                            ? 'bg-slate-800/40 border-slate-700/30'
-                            : isFlagged
-                                ? 'bg-red-950/30 border-red-800/30'
-                                : 'bg-slate-800/20 border-slate-800/40'
+                ? 'bg-blue-950/50 border-blue-700/40'
+                : isSuccess
+                    ? 'bg-emerald-950/30 border-emerald-800/30'
+                    : isSkipped
+                        ? 'bg-slate-800/40 border-slate-700/30'
+                        : isFlagged
+                            ? 'bg-red-950/30 border-red-800/30'
+                            : 'bg-slate-800/20 border-slate-800/40'
                 }`}
         >
             {/* Icon */}
@@ -283,9 +292,9 @@ function StepRow({
             <div className="flex-1 min-w-0">
                 <p
                     className={`font-mono text-xs font-bold truncate ${isScanning ? 'text-blue-300' :
-                            isSuccess ? 'text-emerald-300' :
-                                isFlagged ? 'text-red-300' :
-                                    'text-slate-500'
+                        isSuccess ? 'text-emerald-300' :
+                            isFlagged ? 'text-red-300' :
+                                'text-slate-500'
                         }`}
                 >
                     {step.label}
@@ -302,9 +311,9 @@ function StepRow({
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         className={`flex-shrink-0 font-mono text-[8px] font-black tracking-widest px-2 py-0.5 rounded-md uppercase ${isSuccess ? 'bg-emerald-900/60 text-emerald-400 border border-emerald-800/40' :
-                                isSkipped ? 'bg-slate-700/50 text-slate-400 border border-slate-700/40' :
-                                    isFlagged ? 'bg-red-900/60 text-red-400 border border-red-800/40' :
-                                        'bg-slate-700/50 text-slate-400'
+                            isSkipped ? 'bg-slate-700/50 text-slate-400 border border-slate-700/40' :
+                                isFlagged ? 'bg-red-900/60 text-red-400 border border-red-800/40' :
+                                    'bg-slate-700/50 text-slate-400'
                             }`}
                     >
                         {step.badge}
