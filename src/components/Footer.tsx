@@ -23,7 +23,7 @@ export default function Footer() {
                                 src="/logo.png"
                                 alt="VYN.md"
                                 className="w-10 h-10 object-contain"
-                                style={{ filter: 'invert(27%) sepia(98%) saturate(1700%) hue-rotate(213deg) brightness(97%) contrast(103%)' }}
+                                style={{ filter: 'brightness(0) saturate(100%) invert(27%) sepia(89%) saturate(3167%) hue-rotate(213deg) brightness(102%)' }}
                             />
                         </div>
                         <div>
