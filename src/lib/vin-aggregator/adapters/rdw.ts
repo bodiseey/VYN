@@ -18,6 +18,11 @@ import { IVinDataSource } from '../types';
 // ─────────────────────────────────────────────────────────────────────────────
 
 const RDW_BASE = 'https://opendata.rdw.nl/resource';
+// Dataset IDs (verified working Feb 2026)
+const DS_VEHICLES = 'm9d7-ebf2'; // Gekentekende voertuigen (main)
+const DS_RECALLS = 't49b-isb7'; // Terugroep_actie_status (recall status per plate)
+const DS_FUEL = '8ys7-d773'; // Brandstof + Euro emission class
+
 
 /** Normalize Dutch plate: '12-ABC-3' → '12ABC3', 'ab 12 cd' → 'AB12CD' */
 function normalizePlate(input: string): string {
@@ -117,64 +122,84 @@ export class RdwAdapter implements IVinDataSource {
         // ── 2. Recalls dataset (parallel, non-critical) ───────────────────────
         let recalled = false;
         let recallDetails: string[] = [];
-        try {
-            const recallUrl =
-                `${RDW_BASE}/j9yg-7rg5.json?kenteken=${normalizedPlate}&$limit=5`;
-            const recallRes = await fetch(recallUrl, {
+        let recallStatuses: string[] = [];
+
+        // ── 3. Fuel/Euro class dataset (parallel, non-critical) ───────────────
+        let euroClass: string | null = null;
+        let fuelType: string | null = null;
+
+        await Promise.allSettled([
+            // Recalls
+            fetch(`${RDW_BASE}/${DS_RECALLS}.json?kenteken=${normalizedPlate}&$limit=10`, {
                 headers: this.headers(),
                 signal: AbortSignal.timeout(4000),
                 next: { revalidate: 3600 },
-            });
-            if (recallRes.ok) {
-                const recalls: any[] = await recallRes.json();
+            }).then(r => r.ok ? r.json() : []).then((recalls: any[]) => {
                 recalled = recalls.length > 0;
-                recallDetails = recalls.map(r => r.code_terugroepactie || r.referentiecode_rdw || 'N/A');
-            }
-        } catch { /* non-critical */ }
+                recallDetails = recalls.map(r => r.referentiecode_rdw || 'N/A');
+                recallStatuses = recalls.map(r => r.status || '');
+            }),
+
+            // Fuel + Euro emission class
+            fetch(`${RDW_BASE}/${DS_FUEL}.json?kenteken=${normalizedPlate}&$limit=1`, {
+                headers: this.headers(),
+                signal: AbortSignal.timeout(4000),
+                next: { revalidate: 3600 },
+            }).then(r => r.ok ? r.json() : []).then((fuels: any[]) => {
+                if (fuels.length > 0) {
+                    fuelType = fuels[0].brandstof_omschrijving || null;
+                    euroClass = fuels[0].uitlaatemissieniveau || null;
+                }
+            }),
+        ]);
+
 
         // ── 3. Map to UnifiedVehicleReport fields ────────────────────────────
         return {
             licensePlate: normalizedPlate,
-            formattedPlate: plate, // original user input
+            formattedPlate: plate,
 
             // Identity
-            brand: v.merk || null,                          // e.g. "VOLKSWAGEN"
-            model: v.handelsbenaming || null,                // e.g. "GOLF"
-            vehicleType: v.voertuigsoort || null,            // e.g. "Personenauto"
-            bodyType: v.inrichting || null,                  // e.g. "Hatchback"
-            color: v.eerste_kleur || null,                   // e.g. "ZWART" (black)
-            colorSecondary: v.tweede_kleur || null,
+            brand: v.merk || null,
+            model: v.handelsbenaming || null,
+            vehicleType: v.voertuigsoort || null,
+            bodyType: v.inrichting || null,
+            color: v.eerste_kleur || null,
+            colorSecondary: v.tweede_kleur !== 'Niet geregistreerd' ? v.tweede_kleur : null,
 
             // Registration
             registrationStatus: v.voertuigsoort || null,
-            firstRegistration: formatRdwDate(v.datum_eerste_toelating),  // "2018-03-15"
-            firstRegistrationNL: formatRdwDate(v.datum_eerste_afgifte_nederland), // When imported to NL
+            firstRegistration: formatRdwDate(v.datum_eerste_toelating),
+            firstRegistrationNL: formatRdwDate(v.datum_eerste_tenaamstelling_in_nederland),
             numberOfPreviousOwners: v.aantal_eigenaren !== undefined
                 ? parseInt(v.aantal_eigenaren, 10)
                 : null,
-            exportedFlag: v.exportindicator === 'Ja',        // true if exported
+            exportedFlag: v.export_indicator === 'Ja',
 
-            // Inspection (APK = Dutch equivalent of MOT/ITP)
-            apkExpiry: formatRdwDate(v.vervaldatum_apk),     // e.g. "2024-11-30"
+            // Inspection (APK)
+            apkExpiry: formatRdwDate(v.vervaldatum_apk),
             apkExpiryFormatted: v.vervaldatum_apk_dt || null,
 
             // Technical specs
             numberOfCylinders: v.aantal_cilinders ? parseInt(v.aantal_cilinders, 10) : null,
-            cylinderCapacity: v.cilinderinhoud ? parseInt(v.cilinderinhoud, 10) : null, // in cc
-            fuelType: v.brandstof_omschrijving || null,      // e.g. "Benzine", "Diesel"
+            cylinderCapacity: v.cilinderinhoud ? parseInt(v.cilinderinhoud, 10) : null,
+            fuelType: fuelType || v.brandstof_omschrijving || null,
             powerKw: v.vermogen_massarijklaar ? parseFloat(v.vermogen_massarijklaar) : null,
             numberOfDoors: v.aantal_deuren ? parseInt(v.aantal_deuren, 10) : null,
             numberOfSeats: v.aantal_zitplaatsen ? parseInt(v.aantal_zitplaatsen, 10) : null,
-            massEmpty: v.massa_ledig_voertuig ? parseInt(v.massa_ledig_voertuig, 10) : null, // kg
-            cataloguePrice: formatPrice(v.catalogusprijs),   // Original list price in EUR
+            massEmpty: v.massa_ledig_voertuig ? parseInt(v.massa_ledig_voertuig, 10) : null,
+            cataloguePrice: formatPrice(v.catalogusprijs),
 
             // Safety / environmental
-            euroClass: v.euro_klasse_milieucode || null,     // e.g. "EURO 6"
-            wamStatus: v.wam_verzekerd === 'Ja',             // WAM = mandatory liability insurance
+            euroClass: euroClass || v.euro_klasse_milieucode || null,
+            // RDW flag: openstaande_terugroepactie_indicator = open recall exists on vehicle
+            rdwRecallFlag: v.openstaande_terugroepactie_indicator === 'Ja',
+            wamStatus: v.wam_verzekerd === 'Ja',
 
-            // Recalls
+            // From recall dataset t49b-isb7
             recalled,
             recallCodes: recallDetails,
+            recallStatuses,
         };
     }
 }
