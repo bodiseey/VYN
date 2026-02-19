@@ -35,10 +35,11 @@ export default function VinScanner({ placeholder, cta, rehook }: VinScannerProps
     const vehicleRef = useRef<any>(null);
 
     const validateVin = (v: string) => {
-        const clean = v.toUpperCase().replace(/[^A-Z0-9]/g, '');
-        if (clean.length !== 17) return false;
-        if (/[IOQ]/.test(clean)) return false;
-        return true;
+        const clean = v.toUpperCase().replace(/[\s-]/g, '');
+        // Allow VIN (17) OR Dutch Plate (4-8 chars)
+        if (clean.length === 17) return true;
+        if (clean.length >= 4 && clean.length <= 8 && /^[A-Z0-9]+$/.test(clean)) return true;
+        return false;
     };
 
     const handleScan = async () => {

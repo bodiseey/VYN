@@ -3,18 +3,22 @@ import { z } from 'zod';
 // ─────────────────────────────────────────
 // 1. Strict VIN Validation
 // ─────────────────────────────────────────
-export const VinSchema = z
-    .string()
-    .transform(s => s.toUpperCase().replace(/\s/g, ''))
-    .pipe(
-        z
-            .string()
-            .length(17, 'VIN must be exactly 17 characters')
-            .regex(
-                /^[A-HJ-NPR-Z0-9]{17}$/,
-                'VIN contains invalid characters. Letters I, O, Q are not allowed.'
-            )
-    );
+// ─────────────────────────────────────────
+// 1. Input Validation (VIN or License Plate)
+// ─────────────────────────────────────────
+export const VinSchema = z.string()
+    .transform(s => s.toUpperCase().replace(/[\s-]/g, '')) // Remove spaces and dashes
+    .refine((val) => {
+        const len = val.length;
+        // Case A: VIN (17 chars, no I/O/Q usuall, but we allow simple length check here)
+        const isVin = len === 17;
+        // Case B: Dutch Plate (4-8 chars usually)
+        const isPlate = len >= 4 && len <= 8 && /^[A-Z0-9]+$/.test(val);
+
+        return isVin || isPlate;
+    }, {
+        message: "Input must be a valid 17-character VIN or a Dutch License Plate (4-8 chars)."
+    });
 
 export type ValidVin = z.infer<typeof VinSchema>;
 
