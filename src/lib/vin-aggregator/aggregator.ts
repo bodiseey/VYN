@@ -169,5 +169,12 @@ export async function aggregateVinData(rawVin: string): Promise<UnifiedVehicleRe
             : null,
 
         sources,
+
+        raw: {
+            nhtsa: nhtsa ?? null,
+            rdw: rdw ?? null,
+            dvsa: mot ?? null,
+            scraper: scraper ?? null,
+        }
     };
 }

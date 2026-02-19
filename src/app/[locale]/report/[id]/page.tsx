@@ -26,7 +26,8 @@ import {
     ArrowRight,
     AlertOctagon,
     ShieldAlert,
-    ShieldOff
+    ShieldOff,
+    Database
 } from 'lucide-react';
 import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -337,6 +338,11 @@ export default function ReportPage() {
                                 <Tag className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" /> {t('marketTab')}
                             </TabsTrigger>
                         )}
+                        {report.raw && (
+                            <TabsTrigger value="raw_data" className="flex-1 rounded-xl data-[state=active]:bg-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-indigo-600/20 font-black px-3 md:px-8 h-full flex gap-1 md:gap-3 transition-all text-xs md:text-sm whitespace-nowrap">
+                                <Database className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" /> Date Tehnice
+                            </TabsTrigger>
+                        )}
                     </TabsList>
 
                     {/* ── Safety & Recalls Tab ── */}
@@ -643,6 +649,48 @@ export default function ReportPage() {
                             </Card>
                         )}
                     </TabsContent>
+
+                    {/* Raw Data Tab */}
+                    {report.raw && (
+                        <TabsContent value="raw_data" className="animate-in fade-in slide-in-from-bottom-4 duration-700 outline-none space-y-8">
+                            <Card className="border-none shadow-2xl rounded-[3rem] p-12 bg-slate-900 text-white ring-1 ring-white/10">
+                                <div className="flex items-center gap-6 mb-12">
+                                    <div className="w-16 h-16 bg-indigo-500/20 rounded-2xl flex items-center justify-center border border-indigo-500/30">
+                                        <Database className="w-8 h-8 text-indigo-400" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-3xl font-black tracking-tighter uppercase">API Data Dump</h3>
+                                        <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Transparență Totală • Date Brute Sursă</p>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-6">
+                                    {Object.entries(report.raw).map(([source, data]) => {
+                                        if (!data || Object.keys(data).length === 0) return null;
+                                        return (
+                                            <div key={source} className="border border-slate-700/50 rounded-3xl overflow-hidden bg-slate-950/50">
+                                                <div className="p-6 bg-slate-800/50 flex items-center justify-between border-b border-slate-700/50">
+                                                    <div className="flex items-center gap-4">
+                                                        <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_theme(colors.emerald.500)]"></span>
+                                                        <h4 className="font-mono font-bold uppercase tracking-widest text-indigo-300">{source.toUpperCase()} API</h4>
+                                                    </div>
+                                                    <Badge variant="outline" className="border-slate-600 text-slate-400 font-mono text-[10px]">{Object.keys(data).length} câmpuri</Badge>
+                                                </div>
+                                                <div className="p-0 overflow-x-auto">
+                                                    <pre className="text-[10px] md:text-xs font-mono text-emerald-400/80 p-6 leading-relaxed">
+                                                        {JSON.stringify(data, null, 2)}
+                                                    </pre>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                                <p className="text-center text-slate-500 text-xs font-mono mt-12 uppercase tracking-widest opacity-50">
+                                    Aceste date sunt preluate direct de la sursele guvernamentale și nu sunt alterate.
+                                </p>
+                            </Card>
+                        </TabsContent>
+                    )}
 
                     {/* Timeline Tab */}
                     <TabsContent value="history" className="animate-in fade-in slide-in-from-bottom-4 duration-700 outline-none">

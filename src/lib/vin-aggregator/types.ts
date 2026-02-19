@@ -147,8 +147,20 @@ export const UnifiedVehicleReportSchema = z.object({
         })
         .nullable(),
 
-    /** Per-source execution status for the UI / debugging */
+    /** Per-source execution status */
     sources: z.array(SourceStatusSchema),
+
+    /** 
+     * RAW DATA DUMP (For "Technical Deep Dive" tab)
+     * Stores the complete, unopinionated JSON response from every provider.
+     * Guaranteed 100% data retention.
+     */
+    raw: z.object({
+        nhtsa: z.record(z.string(), z.any()).nullable(),
+        rdw: z.record(z.string(), z.any()).nullable(),
+        dvsa: z.record(z.string(), z.any()).nullable(),
+        scraper: z.record(z.string(), z.any()).nullable(),
+    }).optional(),
 });
 
 export type UnifiedVehicleReport = z.infer<typeof UnifiedVehicleReportSchema>;

@@ -14,6 +14,12 @@ export interface UnifiedReport {
         listings: any[];
     };
     history: any[];
+    raw?: {
+        nhtsa: Record<string, any> | null;
+        rdw: Record<string, any> | null;
+        dvsa: Record<string, any> | null;
+        scraper: Record<string, any> | null;
+    };
 }
 
 // Translation maps for NHTSA values → Romanian
@@ -149,10 +155,11 @@ export async function getFullVehicleReport(vin: string, extended: boolean = fals
     const cleanVin = vin.toUpperCase().trim();
 
     // 1. Fetch from REAL bases (NHTSA, 999, M-Connect)
-    const [nhtsaRes, mdData, marketListings] = await Promise.all([
+    const [nhtsaRes, mdData, marketListings, aggregatorRes] = await Promise.all([
         fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${cleanVin}?format=json`).then(r => r.json()).catch(() => ({})),
         import('./mconnect').then(m => m.getNationalReportData(cleanVin)),
-        search999md(cleanVin)
+        search999md(cleanVin),
+        import('./vin-aggregator/aggregator').then(m => m.aggregateVinData(cleanVin)).catch(() => null)
     ]);
 
     const results = nhtsaRes.Results || [];
@@ -248,6 +255,7 @@ export async function getFullVehicleReport(vin: string, extended: boolean = fals
             currency: 'EUR',
             listings: marketListings
         },
-        history
+        history,
+        raw: aggregatorRes?.raw
     };
 }
