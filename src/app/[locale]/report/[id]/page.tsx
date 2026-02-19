@@ -179,10 +179,13 @@ export default function ReportPage() {
             <nav className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm backdrop-blur-md bg-white/80">
                 <div className="max-w-7xl mx-auto px-4 md:px-8 h-20 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-4 group transition-all duration-300 active:scale-95">
-                        <div className="w-11 h-11 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg shadow-blue-500/30 group-hover:rotate-6 transition-transform">V</div>
+                        <div className="w-9 h-9 md:w-11 md:h-11 flex-shrink-0 relative group-hover:scale-105 transition-transform duration-300">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src="/logo.png" alt="VYN.md" className="w-full h-full object-contain" />
+                        </div>
                         <div className="hidden sm:block">
                             <h1 className="text-lg font-black text-slate-900 uppercase tracking-tighter">VYN.md</h1>
-                            <p className="text-[10px] text-slate-400 font-black tracking-widest uppercase -mt-1 leading-none">Official Report</p>
+                            <p className="text-[10px] text-slate-400 font-black tracking-widest uppercase -mt-1 leading-none">Automotive Intelligence</p>
                         </div>
                     </Link>
 
