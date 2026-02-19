@@ -1,80 +1,36 @@
 import { IVinDataSource } from '../types';
+import { UkMotAdapter } from '@/lib/services/ukMotAdapter';
 
 /**
  * UK DVSA MOT History API Adapter
- *
- * HOW TO GET AN API KEY (FREE):
- * 1. Go to: https://developer-portal.driver-vehicle-licensing.api.gov.uk/
- * 2. Register a free account
- * 3. Subscribe to "MOT History API" (free tier: 500 requests/day)
- * 4. Your API key goes to: process.env.UK_DVSA_KEY
- *
- * ENDPOINT: https://history.mot.api.gov.uk/v1/trade/vehicles/registration/{registration}
- * NOTE: This API works by LICENSE PLATE (registration number), not by VIN directly.
- * For UK vehicles, users should enter the UK license plate.
- * Some UK vehicles can also be found by VIN via the /vin endpoint if the provider supports it.
- *
- * DATA: MOT pass/fail dates, mileage at each test, failure reasons, advisories.
+ * Now uses the official OAuth2-enabled UkMotAdapter.
+ * 
+ * NOTE: Detects if input is a VIN (17 chars) or a registration (UK plate).
  */
 export class DvsaMotAdapter implements IVinDataSource {
-    name = 'UK DVSA MOT History API';
+    name = 'UK Govt (DVSA)';
+    private service = new UkMotAdapter();
 
-    async fetchData(vin: string): Promise<Record<string, any> | null> {
-        const apiKey = process.env.UK_DVSA_KEY;
-
-        if (!apiKey) {
-            console.log('[DvsaMotAdapter] UK_DVSA_KEY not set — skipping adapter.');
-            return null;
-        }
+    async fetchData(input: string): Promise<Record<string, any> | null> {
+        // Detect if it's a UK Plate (usually 4-8 chars) or a VIN (17 chars)
+        const isVin = input.length === 17;
 
         try {
-            // Try VIN-based lookup first (DVSA supports this via the /vin endpoint)
-            const res = await fetch(
-                `https://history.mot.api.gov.uk/v1/trade/vehicles/vin/${encodeURIComponent(vin)}`,
-                {
-                    headers: {
-                        Accept: 'application/json+v6',
-                        'x-api-key': apiKey,
-                        'Content-Type': 'application/json',
-                    },
-                    signal: AbortSignal.timeout(7500),
-                }
-            );
+            const data = isVin
+                ? await this.service.fetchDataByVin(input)
+                : await this.service.fetchData(input);
 
-            if (!res.ok) {
-                // 404 = vehicle not registered in UK, not an error
-                if (res.status === 404) return null;
-                console.warn('[DvsaMotAdapter] Response not OK:', res.status);
-                return null;
-            }
+            if (!data) return null;
 
-            const vehicles: any[] = await res.json();
-            if (!vehicles || vehicles.length === 0) return null;
-
-            // Take the most relevant vehicle (first result)
-            const vehicle = vehicles[0];
-            const motTests = (vehicle.motTests || []).map((test: any) => ({
-                date: test.completedDate || test.motTestDate || '',
-                result: test.testResult === 'PASSED' ? 'PASSED' : 'FAILED',
-                mileage: test.odometerValue ? parseInt(test.odometerValue, 10) : 0,
-                failures: (test.rfrAndComments || [])
-                    .filter((c: any) => c.type === 'FAIL' || c.type === 'MAJOR' || c.type === 'DANGEROUS')
-                    .map((c: any) => c.text || c.comment || ''),
-                advisories: (test.rfrAndComments || [])
-                    .filter((c: any) => c.type === 'ADVISORY' || c.type === 'MINOR')
-                    .map((c: any) => c.text || c.comment || ''),
-            }));
-
-            const latestPassed = motTests.find((t: any) => t.result === 'PASSED');
-
+            // Return normalized record for the aggregator
             return {
-                registration: vehicle.registration || null,
-                latestMileage: latestPassed?.mileage ?? null,
-                motExpiry: vehicle.motTestExpiryDate || null,
-                testResults: motTests.slice(0, 10), // Return up to 10 historical tests
+                ...data,
+                // Add some flags for the aggregator
+                _source: 'DVSA',
+                _isUk: true
             };
         } catch (err) {
-            console.error('[DvsaMotAdapter] Error:', err);
+            console.error('[DvsaMotAdapter] Global error:', err);
             return null;
         }
     }

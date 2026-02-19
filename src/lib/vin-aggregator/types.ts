@@ -168,6 +168,7 @@ export const UnifiedVehicleReportSchema = z.object({
         rdw: z.record(z.string(), z.any()).nullable(),
         dvsa: z.record(z.string(), z.any()).nullable(),
         scraper: z.record(z.string(), z.any()).nullable(),
+        vinaudit: z.record(z.string(), z.any()).nullable(),
     }).optional(),
 });
 

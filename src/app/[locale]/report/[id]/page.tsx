@@ -704,15 +704,71 @@ export default function ReportPage() {
                                 <div className="relative pl-12 space-y-16 before:absolute before:left-[23px] before:top-4 before:bottom-4 before:w-1 before:bg-slate-100 before:rounded-full">
                                     {report.history.map((event, i) => (
                                         <div key={i} className="relative group">
-                                            <div className="absolute -left-[56px] top-1 w-12 h-12 bg-white border-4 border-slate-50 rounded-2xl flex items-center justify-center z-10 shadow-lg group-hover:scale-110 group-hover:rotate-12 transition-all group-hover:border-blue-100 duration-500">
-                                                <Clock className="w-6 h-6 text-slate-300 group-hover:text-blue-500 transition-colors" />
+                                            <div className={`absolute -left-[56px] top-1 w-12 h-12 bg-white border-4 rounded-2xl flex items-center justify-center z-10 shadow-lg group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 ${event.isAlert ? 'border-red-100' :
+                                                    event.isWarning ? 'border-amber-100' :
+                                                        'border-slate-50 group-hover:border-blue-100'
+                                                }`}>
+                                                {event.isAlert ? (
+                                                    <ShieldAlert className="w-6 h-6 text-red-500 animate-pulse" />
+                                                ) : event.isWarning ? (
+                                                    <AlertTriangle className="w-6 h-6 text-amber-500" />
+                                                ) : (
+                                                    <Clock className="w-6 h-6 text-slate-300 group-hover:text-blue-500 transition-colors" />
+                                                )}
                                             </div>
-                                            <div className="space-y-2 md:translate-x-0 group-hover:translate-x-2 transition-transform duration-500">
+                                            <div className="space-y-4 md:translate-x-0 group-hover:translate-x-2 transition-transform duration-500">
                                                 <div className="flex items-center gap-4">
-                                                    <Badge className="bg-slate-900 text-white border-none font-black text-[12px] tracking-tighter px-4 py-1.5 rounded-xl">{event.date}</Badge>
-                                                    <Badge variant="outline" className="border-slate-200 text-slate-400 font-black text-[10px] tracking-widest uppercase py-1.5 px-4 rounded-xl">{event.type}</Badge>
+                                                    <Badge className={`${event.isAlert ? 'bg-red-600' :
+                                                            event.isWarning ? 'bg-amber-500' :
+                                                                'bg-slate-900'
+                                                        } text-white border-none font-black text-[12px] tracking-tighter px-4 py-1.5 rounded-xl`}>
+                                                        {event.date}
+                                                    </Badge>
+                                                    <Badge variant="outline" className={`font-black text-[10px] tracking-widest uppercase py-1.5 px-4 rounded-xl ${event.isAlert ? 'border-red-200 text-red-600' :
+                                                            event.isWarning ? 'border-amber-200 text-amber-600' :
+                                                                'border-slate-200 text-slate-400'
+                                                        }`}>
+                                                        {event.type}
+                                                    </Badge>
                                                 </div>
-                                                <h4 className="text-2xl font-black text-slate-900 tracking-tighter leading-tight max-w-2xl">{event.description}</h4>
+                                                <div className="space-y-2">
+                                                    <h4 className={`text-2xl font-black tracking-tighter leading-tight max-w-2xl ${event.isAlert ? 'text-red-700' : 'text-slate-900'
+                                                        }`}>
+                                                        {event.description}
+                                                    </h4>
+
+                                                    {/* UK Specific Detailed View */}
+                                                    {event.details && (
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                                            {event.details.failures?.length > 0 && (
+                                                                <div className="p-4 bg-red-50 rounded-2xl border border-red-100 space-y-2">
+                                                                    <p className="text-[10px] font-black text-red-400 uppercase tracking-widest">Defecțiuni Majore (UK)</p>
+                                                                    <ul className="list-none space-y-1">
+                                                                        {event.details.failures.map((f: string, idx: number) => (
+                                                                            <li key={idx} className="text-sm font-bold text-red-900 flex items-start gap-2">
+                                                                                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0" />
+                                                                                {f}
+                                                                            </li>
+                                                                        ))}
+                                                                    </ul>
+                                                                </div>
+                                                            )}
+                                                            {event.details.advisories?.length > 0 && (
+                                                                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
+                                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Observații Tehnice (UK)</p>
+                                                                    <ul className="list-none space-y-1">
+                                                                        {event.details.advisories.map((a: string, idx: number) => (
+                                                                            <li key={idx} className="text-sm font-bold text-slate-700 flex items-start gap-2">
+                                                                                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-slate-300 flex-shrink-0" />
+                                                                                {a}
+                                                                            </li>
+                                                                        ))}
+                                                                    </ul>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
                                                 <div className="flex items-center gap-3 text-sm font-black text-slate-400 uppercase tracking-widest italic">
                                                     <MapPin className="w-4 h-4 text-blue-600/50" /> {event.location}
                                                 </div>

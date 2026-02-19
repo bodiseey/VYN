@@ -3,6 +3,7 @@ import { NhtsaAdapter } from './adapters/nhtsa';
 import { DvsaMotAdapter } from './adapters/dvsa-mot';
 import { RdwAdapter } from './adapters/rdw';
 import { PublicScraperAdapter } from './adapters/scraper-stub';
+import { VinAuditAdapter } from './adapters/vinaudit';
 
 const ADAPTER_TIMEOUT_MS = 8000;
 
@@ -40,6 +41,7 @@ export async function aggregateVinData(rawVin: string): Promise<UnifiedVehicleRe
         new DvsaMotAdapter(),
         new RdwAdapter(),
         new PublicScraperAdapter(),
+        new VinAuditAdapter(),
     ];
 
     // 3. Run all adapters concurrently with individual timeouts
@@ -67,11 +69,13 @@ export async function aggregateVinData(rawVin: string): Promise<UnifiedVehicleRe
     const motResult = getResult(1);
     const rdwResult = getResult(2);
     const scraperResult = getResult(3);
+    const vinauditResult = getResult(4);
 
     const nhtsa = nhtsaResult.data;
     const mot = motResult.data;
     const rdw = rdwResult.data;
     const scraper = scraperResult.data;
+    const vinaudit = vinauditResult.data;
 
     // 5. Build source status log for the UI
     const sourceStatus = (
@@ -91,6 +95,7 @@ export async function aggregateVinData(rawVin: string): Promise<UnifiedVehicleRe
         sourceStatus(adapters[1].name, motResult),
         sourceStatus(adapters[2].name, rdwResult),
         sourceStatus(adapters[3].name, scraperResult),
+        sourceStatus(adapters[4].name, vinauditResult),
     ];
 
     // 6. Build normalized UnifiedVehicleReport
@@ -183,6 +188,7 @@ export async function aggregateVinData(rawVin: string): Promise<UnifiedVehicleRe
             rdw: rdw ?? null,
             dvsa: mot ?? null,
             scraper: scraper ?? null,
+            vinaudit: vinaudit ?? null,
         }
     };
 }

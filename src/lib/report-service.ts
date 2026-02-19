@@ -19,6 +19,7 @@ export interface UnifiedReport {
         rdw: Record<string, any> | null;
         dvsa: Record<string, any> | null;
         scraper: Record<string, any> | null;
+        vinaudit: Record<string, any> | null;
     };
 }
 
@@ -165,10 +166,7 @@ export async function getFullVehicleReport(vin: string, extended: boolean = fals
         search999md(cleanVin)
     ]);
 
-    // 3. Determine Identity (Source of Truth Priority: RDW/DVSA > NHTSA)
-    // If aggregator successfully identified the car via RDW (Netherlands) or DVSA (UK), use that.
-    // Otherwise fallback to whatever NHTSA found (or didn't find).
-
+    // 3. Determine Identity (Source of Truth Priority: RDW > DVSA > NHTSA)
     let vehicleIdentity = {
         make: aggregatorRes?.identity?.make,
         model: aggregatorRes?.identity?.model,
@@ -183,15 +181,26 @@ export async function getFullVehicleReport(vin: string, extended: boolean = fals
     };
 
     // Fallback/Enhancement logic:
-    // If invalid NHTSA response but we have RDW data (Netherlands Plate)
+    // Priority 1: Netherlands (RDW)
     if ((!vehicleIdentity.make || vehicleIdentity.make === 'Unknown') && aggregatorRes?.rdwData?.brand) {
         vehicleIdentity.make = aggregatorRes.rdwData.brand;
         vehicleIdentity.model = aggregatorRes.rdwData.model;
-        vehicleIdentity.year = aggregatorRes.rdwData.firstRegistration?.substring(0, 4); // 2020-01-01 -> 2020
-        vehicleIdentity.country = 'NETHERLANDS'; // It's from RDW
+        vehicleIdentity.year = aggregatorRes.rdwData.firstRegistration?.substring(0, 4);
+        vehicleIdentity.country = 'NETHERLANDS';
         vehicleIdentity.fuel = aggregatorRes.rdwData.fuel;
-        // RDW specific specs
-        // engine/hp might be in raw rdw data, we can use that in future
+    }
+
+    // Priority 2: UK (DVSA)
+    if ((!vehicleIdentity.make || vehicleIdentity.make === 'Unknown') && aggregatorRes?.motHistory) {
+        // aggregatorRes.raw.dvsa contains the detailed UK data
+        const dvsa = aggregatorRes.raw?.dvsa;
+        if (dvsa) {
+            vehicleIdentity.make = dvsa.make;
+            vehicleIdentity.model = dvsa.model;
+            vehicleIdentity.year = dvsa.firstUsedDate?.substring(0, 4) || dvsa.registrationDate?.substring(0, 4);
+            vehicleIdentity.country = 'UNITED KINGDOM';
+            vehicleIdentity.fuel = dvsa.fuelType;
+        }
     }
 
     // Nhtsa Raw for deep specs mapping (legacy support)
@@ -233,6 +242,72 @@ export async function getFullVehicleReport(vin: string, extended: boolean = fals
 
     // 3. Timeline Construction
     const history: any[] = [];
+
+    // UK MOT Events
+    if (aggregatorRes?.motHistory?.testResults) {
+        aggregatorRes.motHistory.testResults.forEach((test: any) => {
+            history.push({
+                date: test.date,
+                type: test.result === 'PASSED' ? 'ITP (UK)' : 'ITP EȘUAT (UK)',
+                description: [
+                    `Inspecție tehnică în Marea Britanie: ${test.result}`,
+                    test.mileage ? `Kilometraj: ${test.mileage} mile (~${Math.round(test.mileage * 1.609)} KM)` : null,
+                    test.failures?.length ? `Eșecuri: ${test.failures.join(', ')}` : null,
+                    test.advisories?.length ? `Observații: ${test.advisories.join(', ')}` : null
+                ].filter(Boolean).join(' | '),
+                location: 'Marea Britanie',
+                details: {
+                    failures: test.failures,
+                    advisories: test.advisories,
+                    mileage: test.mileage
+                }
+            });
+        });
+    }
+
+    // Global Databases (VinAudit)
+    if (aggregatorRes?.raw?.vinaudit) {
+        const va = aggregatorRes.raw.vinaudit;
+
+        // Theft Records
+        if (va.theftRecords && va.theftRecords.length > 0) {
+            va.theftRecords.forEach((record: any) => {
+                history.push({
+                    date: record.date || new Date().toISOString().split('T')[0],
+                    type: 'ALERTA FURT (GLOBAL)',
+                    description: `Înregistrare furt detectată: ${record.description || 'Fără detalii'}`,
+                    location: record.region || 'Global',
+                    isAlert: true
+                });
+            });
+        }
+
+        // Salvage / Auction Records
+        if (va.auctionHistory && va.auctionHistory.length > 0) {
+            va.auctionHistory.forEach((record: any) => {
+                history.push({
+                    date: record.date || record.disposition_date || '',
+                    type: 'LICITAȚIE SALVARE',
+                    description: `Vehicul vândut la licitație de salvare. Daune raportate: ${record.damage || 'Daune majore'} | Odometer: ${record.odometer_reading || 'N/A'}`,
+                    location: record.state || 'Global',
+                    isWarning: true
+                });
+            });
+        }
+
+        // Junk Records
+        if (va.junk && va.junk.length > 0) {
+            va.junk.forEach((record: any) => {
+                history.push({
+                    date: record.date || record.disposition_date || '',
+                    type: 'CASARE / JUNK',
+                    description: `Vehicul declarat daună totală/casat. Entitate: ${record.entity_name || 'N/A'}`,
+                    location: record.state || 'Global',
+                    isAlert: true
+                });
+            });
+        }
+    }
 
     // RDW Events (Netherlands)
     if (aggregatorRes?.rdwData) {
