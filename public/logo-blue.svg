@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080">
+  <!--
+    VYN logo V-mark
+    Fill color: oklch(54.6% 0.245 262.881) = Tailwind blue-600
+    This matches bg-blue-600 exactly on Tailwind v4
+  -->
+  <path fill="oklch(54.6% 0.245 262.881)" d="
+    M 72,77
+    L 233,77
+    L 233,177
+    L 186,177
+    C 156,177 136,197 136,227
+    L 136,318
+    L 270,453
+    L 270,453
+    L 540,740
+    L 810,453
+    L 944,318
+    L 944,227
+    C 944,197 924,177 894,177
+    L 847,177
+    L 847,77
+    L 1008,77
+    L 540,600
+    L 72,77
+    Z
+  "/>
+</svg>

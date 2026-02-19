@@ -15,13 +15,13 @@ export default function Navbar() {
             <div className="max-w-7xl mx-auto px-4 md:px-8 h-full flex items-center justify-between">
                 <Link href="/" className="flex items-center gap-3 md:gap-4 group transition-all duration-300 active:scale-95">
                     {/* Logo mark */}
-                    <div className="w-9 h-9 md:w-11 md:h-11 flex-shrink-0 relative group-hover:scale-105 transition-transform duration-300">
+                    <div className="w-9 h-9 md:w-11 md:h-11 flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
                         <Image
-                            src="/logo.png"
+                            src="/logo-blue.svg"
                             alt="VYN.md Logo"
-                            fill
-                            className="object-contain"
-                            style={{ filter: 'brightness(0) saturate(100%) invert(27%) sepia(89%) saturate(3167%) hue-rotate(213deg) brightness(102%)' }}
+                            width={44}
+                            height={44}
+                            className="w-full h-full object-contain"
                             priority
                         />
                     </div>

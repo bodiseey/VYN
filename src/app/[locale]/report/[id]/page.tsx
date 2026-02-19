@@ -181,7 +181,7 @@ export default function ReportPage() {
                     <Link href="/" className="flex items-center gap-4 group transition-all duration-300 active:scale-95">
                         <div className="w-9 h-9 md:w-11 md:h-11 flex-shrink-0 relative group-hover:scale-105 transition-transform duration-300">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src="/logo.png" alt="VYN.md" className="w-full h-full object-contain" style={{ filter: 'brightness(0) saturate(100%) invert(27%) sepia(89%) saturate(3167%) hue-rotate(213deg) brightness(102%)' }} />
+                            <img src="/logo-blue.svg" alt="VYN.md" className="w-full h-full object-contain" />
                         </div>
                         <div className="hidden sm:block">
                             <h1 className="text-lg font-black text-slate-900 uppercase tracking-tighter">VYN.md</h1>

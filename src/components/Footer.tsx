@@ -16,14 +16,12 @@ export default function Footer() {
                     {/* Brand block */}
                     <div className="flex items-center gap-4">
                         {/* Blue logo mark — SVG inline so we can use blue fill */}
-                        <div className="w-10 h-10 flex-shrink-0 relative">
-                            {/* Blue-tinted version of the logo using CSS filter */}
+                        <div className="w-10 h-10 flex-shrink-0">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
-                                src="/logo.png"
+                                src="/logo-blue.svg"
                                 alt="VYN.md"
                                 className="w-10 h-10 object-contain"
-                                style={{ filter: 'brightness(0) saturate(100%) invert(27%) sepia(89%) saturate(3167%) hue-rotate(213deg) brightness(102%)' }}
                             />
                         </div>
                         <div>
