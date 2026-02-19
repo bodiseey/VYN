@@ -11,28 +11,48 @@ export async function GET(req: NextRequest) {
     const rawInput = searchParams.get('vin') || ''; // 'vin' param used for both
     const input = rawInput.toUpperCase().replace(/[\s-]/g, '');
 
-    // ── CASE A: Dutch License Plate (4-8 chars) ─────────────────────────────
+    // ── CASE A: License Plate (4-8 chars) - Try Netherlands, then UK ─────────
     if (input.length >= 4 && input.length <= 8) {
         try {
-            console.log(`[Scan] Detected possible Dutch plate: ${input}`);
+            console.log(`[Scan] Detected plate format: ${input}. Trying RDW...`);
             const rdwData = await fetchRdwData(input);
+
             if (rdwData && rdwData.brand) {
                 return NextResponse.json({
                     success: true,
                     ModelYear: rdwData.firstRegistration ? rdwData.firstRegistration.substring(0, 4) : 'N/A',
                     Make: rdwData.brand,
                     Model: rdwData.model,
-                    PlantCountry: 'NETHERLANDS', // infer location from source
-                    vin: input, // return input as ID since we don't have VIN
+                    PlantCountry: 'NETHERLANDS',
+                    vin: input,
                     id: `rdw_${input}`,
                     source: 'RDW'
                 });
-            } else {
-                return NextResponse.json({ success: false, error: 'Număr înmatriculare Olanda invalid sau vehicul negăsit.' }, { status: 404 });
             }
+
+            // If not found in NL, try UK (DVSA)
+            console.log(`[Scan] Not found in RDW. Trying UK DVSA...`);
+            const { UkMotAdapter } = await import('@/lib/services/ukMotAdapter');
+            const ukService = new UkMotAdapter();
+            const ukData = await ukService.fetchData(input);
+
+            if (ukData && ukData.make) {
+                return NextResponse.json({
+                    success: true,
+                    ModelYear: ukData.registrationDate ? ukData.registrationDate.substring(0, 4) : (ukData.firstUsedDate ? ukData.firstUsedDate.substring(0, 4) : 'N/A'),
+                    Make: ukData.make,
+                    Model: ukData.model,
+                    PlantCountry: 'UNITED KINGDOM',
+                    vin: input,
+                    id: `uk_${input}`,
+                    source: 'DVSA'
+                });
+            }
+
+            return NextResponse.json({ success: false, error: 'Vehiculul nu a fost găsit în bazele de date Olanda sau Anglia.' }, { status: 404 });
         } catch (err) {
-            console.error('[Scan] RDW Error:', err);
-            return NextResponse.json({ success: false, error: 'Eroare la verificare RDW' }, { status: 500 });
+            console.error('[Scan] Registry Error:', err);
+            return NextResponse.json({ success: false, error: 'Eroare la verificare baze date externe' }, { status: 500 });
         }
     }
 

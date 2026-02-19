@@ -7,7 +7,12 @@ import { z } from 'zod';
 // 1. Input Validation (VIN or License Plate)
 // ─────────────────────────────────────────
 export const VinSchema = z.string()
-    .transform(s => s.toUpperCase().replace(/[\s-]/g, '')) // Remove spaces and dashes
+    .transform(s => {
+        let val = s.toUpperCase().replace(/[\s-]/g, '');
+        // Strip internal prefixes if any
+        val = val.replace(/^(UK_|RDW_|NHTSA_)/, '');
+        return val;
+    })
     .refine((val) => {
         const len = val.length;
         // Case A: VIN (17 chars, no I/O/Q usuall, but we allow simple length check here)

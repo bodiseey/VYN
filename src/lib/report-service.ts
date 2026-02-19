@@ -153,7 +153,9 @@ async function search999md(vin: string) {
  * Aggregates all REAL data
  */
 export async function getFullVehicleReport(vin: string, extended: boolean = false): Promise<UnifiedReport> {
-    const cleanVin = vin.toUpperCase().trim();
+    let cleanVin = vin.toUpperCase().trim().replace(/[\s-]/g, '');
+    // Strip internal ID prefixes added by the scan API
+    cleanVin = cleanVin.replace(/^(UK_|RDW_|NHTSA_)/, '');
 
     // 1. Run Aggregator FIRST (It handles RDW, DVSA, NHTSA logic centrally)
     const aggregatorRes = await import('./vin-aggregator/aggregator')
