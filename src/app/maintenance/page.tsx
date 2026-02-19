@@ -70,7 +70,7 @@ export default function MaintenancePage() {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
 
                         {/* ── LEFT — Brand description ── */}
-                        <div className="space-y-6 order-2 lg:order-1">
+                        <div className="space-y-6 order-1 lg:order-1">
 
                             {/* Status badge */}
                             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600 font-semibold text-sm shadow-sm">
@@ -111,7 +111,7 @@ export default function MaintenancePage() {
                         </div>
 
                         {/* ── RIGHT — Access form ── */}
-                        <div className="order-1 lg:order-2 flex justify-center lg:justify-end">
+                        <div className="order-2 lg:order-2 flex justify-center lg:justify-end">
                             <div className="w-full max-w-sm">
                                 <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl shadow-blue-100/60 p-8">
 
