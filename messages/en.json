@@ -1,7 +1,8 @@
 {
     "HomePage": {
-        "title": "Check car history with AI",
-        "subtitle": "Enter the VIN code to receive a detailed report and advice from our AI assistant.",
+        "title": "Second-hand car? Check it with AI.",
+        "subtitle": "We use Automotive Intelligence to scan national and international databases on your behalf. We help you avoid costly mistakes and quickly decide if the car is truly right for you.",
+        "vinHint": "Enter the VIN code to receive a detailed report and advice from our AI assistant.",
         "inputPlaceholder": "Enter VIN code (17 characters)",
         "cta": "Scan vehicle with AI",
         "rehook": "Scan another VIN",

@@ -40,8 +40,11 @@ export default function HomePage() {
                         </p>
                     </header>
 
-                    <div className="max-w-2xl mx-auto w-full">
+                    <div className="max-w-2xl mx-auto w-full space-y-3">
                         <VinScanner placeholder={t('inputPlaceholder')} cta={t('cta')} />
+                        <p className="text-slate-400 text-xs text-center font-medium leading-relaxed px-2">
+                            {t('vinHint')}
+                        </p>
                     </div>
 
                     <div className="text-slate-400 text-sm font-medium">

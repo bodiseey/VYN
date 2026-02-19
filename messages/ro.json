@@ -1,7 +1,8 @@
 {
     "HomePage": {
-        "title": "Verifică istoricul mașinii cu AI",
-        "subtitle": "Introdu codul VIN pentru a primi un raport detaliat și sfaturi de la asistentul nostru AI.",
+        "title": "Mașină la mâna a doua? Verifică cu AI.",
+        "subtitle": "Folosim Automotive Intelligence pentru a scana baze de date naționale și internaționale în locul tău. Te ajutăm să eviți investițiile păguboase și să decizi rapid dacă mașina este cu adevărat potrivită pentru tine.",
+        "vinHint": "Introdu codul VIN pentru a primi un raport detaliat și sfaturi de la asistentul nostru AI.",
         "inputPlaceholder": "Introdu codul VIN (17 caractere)",
         "cta": "Scanează vehiculul cu AI",
         "rehook": "Scanează alt VIN",
