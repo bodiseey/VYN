@@ -97,7 +97,7 @@ const COUNTRY_RO: Record<string, string> = {
     'SOUTH AFRICA': 'Africa de Sud',
 };
 
-function translateValue(map: Record<string, string>, value: string | undefined): string | undefined {
+function translateValue(map: Record<string, string>, value: string | null | undefined): string | undefined {
     if (!value) return undefined;
     // Try exact match first
     if (map[value]) return map[value];
