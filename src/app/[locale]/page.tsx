@@ -33,7 +33,8 @@ export default function HomePage() {
                             <span>AI Powered Car Assistant</span>
                         </div>
                         <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 leading-[1.1]">
-                            {t('title')}
+                            {t('titleBlack')}<br />
+                            <span className="text-blue-600">{t('titleBlue')}</span>
                         </h1>
                         <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
                             {t('subtitle')}
