@@ -3,8 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, ArrowRight, Lock, Shield, Brain, Database, Zap } from 'lucide-react';
-
-const LOGO_FILTER = "brightness(0) saturate(100%) invert(23%) sepia(96%) saturate(2078%) hue-rotate(217deg) brightness(104%)";
+import { LogoMark } from '@/components/LogoMark';
 
 export default function MaintenancePage() {
     const [password, setPassword] = useState('');
@@ -50,10 +49,9 @@ export default function MaintenancePage() {
         <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
 
             {/* ── Navbar ── */}
-            <nav className="bg-white/80 backdrop-blur-md border-b border-slate-200 h-18 md:h-20 flex items-center px-5 md:px-10 flex-shrink-0">
+            <nav className="bg-white/80 backdrop-blur-md border-b border-slate-200 h-16 md:h-20 flex items-center px-5 md:px-10 flex-shrink-0">
                 <div className="flex items-center gap-3">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/logo.png" alt="VYN.md" className="w-9 h-9 object-contain" style={{ filter: LOGO_FILTER }} />
+                    <LogoMark size={36} />
                     <div>
                         <div className="text-base font-black text-slate-900 uppercase tracking-tighter leading-none">VYN.md</div>
                         <div className="text-[9px] text-slate-400 font-black tracking-[0.2em] uppercase leading-none mt-0.5">Automotive Intelligence</div>
@@ -61,18 +59,18 @@ export default function MaintenancePage() {
                 </div>
             </nav>
 
-            {/* ── Main content ── */}
-            <div className="flex-1 flex items-center justify-center px-5 md:px-10 py-12 md:py-16 relative overflow-hidden">
+            {/* ── Main ── */}
+            <div className="flex-1 flex items-center justify-center px-5 md:px-10 py-10 md:py-16 relative overflow-hidden">
 
-                {/* Ambient background — same as homepage */}
+                {/* Ambient gradients — same as homepage */}
                 <div className="absolute top-[-15%] left-[-8%] w-[50%] h-[60%] bg-blue-100 rounded-full blur-[130px] opacity-50 pointer-events-none" />
                 <div className="absolute bottom-[-15%] right-[-8%] w-[45%] h-[55%] bg-indigo-100 rounded-full blur-[110px] opacity-40 pointer-events-none" />
 
                 <div className="relative z-10 w-full max-w-6xl mx-auto">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
 
-                        {/* ── LEFT — Brand & description ── */}
-                        <div className="space-y-7 order-2 lg:order-1">
+                        {/* ── LEFT — Brand description ── */}
+                        <div className="space-y-6 order-2 lg:order-1">
 
                             {/* Status badge */}
                             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600 font-semibold text-sm shadow-sm">
@@ -85,7 +83,7 @@ export default function MaintenancePage() {
 
                             {/* Heading */}
                             <div className="space-y-4">
-                                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.05]">
+                                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.05]">
                                     Primul sistem de<br />
                                     <span className="text-blue-600">verificare auto</span><br />
                                     din Moldova
@@ -95,19 +93,18 @@ export default function MaintenancePage() {
                                 </p>
                             </div>
 
-                            {/* Feature list */}
+                            {/* Features */}
                             <div className="space-y-3">
                                 {features.map(({ icon: Icon, text }, i) => (
                                     <div key={i} className="flex items-start gap-3">
                                         <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                                             <Icon className="w-4 h-4 text-blue-600" />
                                         </div>
-                                        <p className="text-slate-500 text-sm font-medium leading-relaxed pt-1.5">{text}</p>
+                                        <p className="text-slate-500 text-sm font-medium leading-relaxed pt-2">{text}</p>
                                     </div>
                                 ))}
                             </div>
 
-                            {/* Powered by */}
                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">
                                 Powered by BODISHTYAN SOLUTIONS SRL
                             </p>
@@ -118,14 +115,14 @@ export default function MaintenancePage() {
                             <div className="w-full max-w-sm">
                                 <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl shadow-blue-100/60 p-8">
 
-                                    {/* Form icon */}
+                                    {/* Lock icon */}
                                     <div className="flex justify-center mb-6">
                                         <div className="w-16 h-16 bg-blue-50 border border-blue-100 rounded-2xl flex items-center justify-center">
                                             <Lock className="w-7 h-7 text-blue-600" />
                                         </div>
                                     </div>
 
-                                    {/* Form header */}
+                                    {/* Header */}
                                     <div className="text-center mb-7 space-y-2">
                                         <h2 className="text-xl font-black text-slate-900 tracking-tight">Acces Restricționat</h2>
                                         <p className="text-slate-400 text-sm font-medium leading-relaxed">
@@ -173,10 +170,9 @@ export default function MaintenancePage() {
                                         </button>
                                     </form>
 
-                                    {/* Divider */}
                                     <div className="mt-6 pt-6 border-t border-slate-100 text-center">
                                         <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                                            vyn.md © 2025 · Toate drepturile rezervate
+                                            VYN.md © 2026 · Toate drepturile rezervate
                                         </p>
                                     </div>
                                 </div>
@@ -190,12 +186,11 @@ export default function MaintenancePage() {
             {/* ── Footer ── */}
             <div className="border-t border-slate-200 bg-white py-4 px-5 md:px-10 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/logo.png" alt="VYN.md" className="w-6 h-6 object-contain" style={{ filter: LOGO_FILTER }} />
+                    <LogoMark size={22} />
                     <span className="text-xs font-black text-slate-900 uppercase tracking-tighter">VYN.md</span>
                 </div>
                 <p className="text-[10px] text-slate-400 font-medium">Powered by BODISHTYAN SOLUTIONS SRL</p>
-                <p className="text-[10px] text-slate-400 font-medium hidden sm:block">© 2025 Toate drepturile rezervate</p>
+                <p className="text-[10px] text-slate-400 font-medium hidden sm:block">© 2026 Toate drepturile rezervate</p>
             </div>
 
         </div>

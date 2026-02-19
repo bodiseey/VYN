@@ -181,7 +181,17 @@ export default function ReportPage() {
                     <Link href="/" className="flex items-center gap-4 group transition-all duration-300 active:scale-95">
                         <div className="w-9 h-9 md:w-11 md:h-11 flex-shrink-0 relative group-hover:scale-105 transition-transform duration-300">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src="/logo.png" alt="VYN.md" className="w-full h-full object-contain" style={{ filter: 'brightness(0) saturate(100%) invert(23%) sepia(96%) saturate(2078%) hue-rotate(217deg) brightness(104%)' }} />
+                            <img src="/logo.png" alt="VYN.md" className="w-full h-full object-contain" style={{
+                                backgroundColor: 'oklch(54.6% 0.245 262.881)',
+                                WebkitMaskImage: 'url(/logo.png)',
+                                maskImage: 'url(/logo.png)',
+                                WebkitMaskSize: 'contain',
+                                maskSize: 'contain',
+                                WebkitMaskRepeat: 'no-repeat',
+                                maskRepeat: 'no-repeat',
+                                WebkitMaskPosition: 'center',
+                                maskPosition: 'center',
+                            } as React.CSSProperties} />
                         </div>
                         <div className="hidden sm:block">
                             <h1 className="text-lg font-black text-slate-900 uppercase tracking-tighter">VYN.md</h1>

@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
+import { LogoMark } from './LogoMark';
 
 export default function Footer() {
     const t = useTranslations('Footer');
@@ -15,16 +16,7 @@ export default function Footer() {
 
                     {/* Brand block */}
                     <div className="flex items-center gap-4">
-                        {/* Blue logo mark — SVG inline so we can use blue fill */}
-                        <div className="w-10 h-10 flex-shrink-0">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                                src="/logo.png"
-                                alt="VYN.md"
-                                className="w-10 h-10 object-contain"
-                                style={{ filter: 'brightness(0) saturate(100%) invert(23%) sepia(96%) saturate(2078%) hue-rotate(217deg) brightness(104%)' }}
-                            />
-                        </div>
+                        <LogoMark size={40} />
                         <div>
                             <span className="font-black text-2xl tracking-tighter text-slate-900 block leading-none">VYN.md</span>
                             <span className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em] leading-none mt-1 block">
