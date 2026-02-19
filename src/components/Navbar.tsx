@@ -17,11 +17,12 @@ export default function Navbar() {
                     {/* Logo mark */}
                     <div className="w-9 h-9 md:w-11 md:h-11 flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
                         <Image
-                            src="/logo-blue.svg"
+                            src="/logo.png"
                             alt="VYN.md Logo"
                             width={44}
                             height={44}
                             className="w-full h-full object-contain"
+                            style={{ filter: 'brightness(0) saturate(100%) invert(23%) sepia(96%) saturate(2078%) hue-rotate(217deg) brightness(104%)' }}
                             priority
                         />
                     </div>

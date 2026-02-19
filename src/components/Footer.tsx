@@ -19,9 +19,10 @@ export default function Footer() {
                         <div className="w-10 h-10 flex-shrink-0">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
-                                src="/logo-blue.svg"
+                                src="/logo.png"
                                 alt="VYN.md"
                                 className="w-10 h-10 object-contain"
+                                style={{ filter: 'brightness(0) saturate(100%) invert(23%) sepia(96%) saturate(2078%) hue-rotate(217deg) brightness(104%)' }}
                             />
                         </div>
                         <div>
